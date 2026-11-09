@@ -64,7 +64,7 @@ window.CONTENT = {
           tags: ["Mobile banking", "White-label", "Pix", "Team leadership"],
           bullets: [
             "<b>Led two teams</b> of 7 people for two and a half years.",
-            "At Dimensa (mobile2you), delivered <b>7+ white-label banking apps</b> for client banks such as <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> and BBC Caminhoneiros, each tailored to the client's product and brand.",
+            "At Dimensa (mobile2you), delivered <b>7+ white-label banking apps</b> for client banks such as <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> and <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, each tailored to the client's product and brand.",
             "Worked on the <b>Dimensa app</b>, the rebuild of the white-label platform itself.",
             "Implemented <b>Pix</b> payments and refunds in the white-label core, live in production across the apps built on it.",
           ] },
@@ -167,7 +167,7 @@ window.CONTENT = {
           tags: ["Mobile banking", "White-label", "Pix", "Liderança"],
           bullets: [
             "<b>Liderei dois times</b> de 7 pessoas por dois anos e meio.",
-            "Pela Dimensa (mobile2you), entreguei <b>7+ apps bancários white-label</b> para bancos clientes como <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> e BBC Caminhoneiros, cada um adaptado ao produto e à marca do cliente.",
+            "Pela Dimensa (mobile2you), entreguei <b>7+ apps bancários white-label</b> para bancos clientes como <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> e <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, cada um adaptado ao produto e à marca do cliente.",
             "Trabalhei no <b>app Dimensa</b>, a reformulação da própria plataforma white-label.",
             "Implementei <b>Pix</b> e devolução de Pix no núcleo white-label, em produção em todos os apps construídos sobre ele.",
           ] },
