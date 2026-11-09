@@ -128,9 +128,9 @@ kbd { font: 500 .78em var(--mono); padding: .15em .45em; border: 1px solid var(-
 .orbit-wrap { display: grid; justify-items: center; gap: 14px; }
 .orbit { --size: min(440px, 42vw); position: relative; width: var(--size); aspect-ratio: 1; transform: translate(var(--px, 0), var(--py, 0)); transition: transform .6s var(--ease); }
 .ring { position: absolute; inset: 0; margin: auto; border-radius: 50%; border: 1px solid var(--line-2); }
-.r1 { width: 44%; height: 44%; } .r2 { width: 72%; height: 72%; border-style: dashed; } .r3 { width: 100%; height: 100%; }
-.spinner { position: absolute; inset: 0; margin: auto; border-radius: 50%; animation: spin linear infinite; }
-.s1 { width: 44%; height: 44%; animation-duration: 38s; } .s2 { width: 72%; height: 72%; animation-duration: 60s; animation-direction: reverse; } .s3 { width: 100%; height: 100%; animation-duration: 84s; }
+.r1 { width: 52%; height: 52%; } .r2 { width: 72%; height: 72%; border-style: dashed; } .r3 { width: 100%; height: 100%; }
+.spinner { position: absolute; inset: 0; margin: auto; border-radius: 50%; animation: spin linear infinite; z-index: 2; }   /* node labels sit above the coin */
+.s1 { width: 52%; height: 52%; animation-duration: 38s; } .s2 { width: 72%; height: 72%; animation-duration: 60s; animation-direction: reverse; } .s3 { width: 100%; height: 100%; animation-duration: 84s; }
 .orbit:hover .spinner, .orbit:focus-within .spinner { animation-play-state: paused; }
 /* The spinners are full-size circles stacked on top of each other: they must not swallow clicks
    meant for nodes on the inner rings. Only the node labels take pointer input. */
@@ -141,7 +141,7 @@ kbd { font: 500 .78em var(--mono); padding: .15em .45em; border: 1px solid var(-
   position: absolute; left: 50%; top: 50%; width: 0; height: 0;
   transform: rotate(var(--a)) translateX(calc(var(--r, 1) * 50%));
 }
-.s1 .node { transform: rotate(var(--a)) translate(calc(var(--size) * .22)); }
+.s1 .node { transform: rotate(var(--a)) translate(calc(var(--size) * .26)); }
 .s2 .node { transform: rotate(var(--a)) translate(calc(var(--size) * .36)); }
 .s3 .node { transform: rotate(var(--a)) translate(calc(var(--size) * .5)); }
 .node span {
@@ -171,7 +171,7 @@ kbd { font: 500 .78em var(--mono); padding: .15em .45em; border: 1px solid var(-
 .cat-name { position: absolute; left: 50%; bottom: 9%; translate: -50% 0; padding: 2px 9px; border-radius: 999px; font: 700 11px var(--font); letter-spacing: .04em; color: #fff; background: rgba(0,0,0,.62); }   /* no backdrop-filter: in Chrome it breaks backface-visibility and shows the back of the coin */
 [data-theme="dark"] .cat-light, [data-theme="light"] .cat-dark { display: none; }
 .core:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
-.core::after { content: ""; position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(var(--tint),.35); animation: pulse 3.2s var(--ease) infinite; }
+.core::after { content: ""; position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(var(--tint),.35); animation: pulse 3.2s var(--ease) infinite; pointer-events: none; }   /* the growing pulse ring must not swallow clicks meant for the inner nodes */
 @keyframes pulse { 0% { transform: scale(.85); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 .orbit-hint { margin: 0; font: 500 12px var(--mono); color: var(--faint); letter-spacing: .04em; }
 .scroll-cue { position: absolute; bottom: 26px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid var(--line-2); border-radius: 14px; z-index: 1; }
