@@ -1,16 +1,16 @@
-// All copy lives here, one object per language. main.js renders the page from it.
+// All copy lives here, one object per language. build.mjs bakes it into the HTML; main.js re-renders it on language switch.
 window.CONTENT = {
   en: {
-    meta: { title: "Guilherme Andreúce · Senior Full-Stack Developer", description: "I build the business-critical parts of a product: search, revenue, payments, integrations and deploys, with AI in the loop." },
-    nav: { impact: "Impact", experience: "Experience", stack: "Stack", security: "Security", projects: "Projects", contact: "Contact", palette: "Search or jump to…" },
-    a11y: { skip: "Skip to content", sections: "Sections", menu: "Open menu", theme: "Switch light / dark theme", lang: "PT: ler em português",
+    meta: { title: "Guilherme Andreúce · Full-Stack Developer", description: "I build the business-critical parts of a product: search, revenue, payments, integrations and deploys, with AI in the loop." },
+    nav: { impact: "Impact", experience: "Experience", stack: "Stack", security: "Security", projects: "Projects", contact: "Contact", palette: "Search or jump to…", langLabel: "PT" },
+    a11y: { skip: "Skip to content", sections: "Sections", menu: "Sections menu", home: "Guilherme Andreúce, home", scroll: "Scroll to content", theme: "Switch light / dark theme", lang: "PT: ler em português",
       palette: "Command palette", paletteInput: "Search commands and sections", filters: "Filter technologies", game: "Riposte timing game: press to play", coin: "Flip the coin: me on one side, one of my cats on the other" },
     hero: {
-      eyebrow: "Senior Full-Stack Developer",
+      eyebrow: "Full-Stack Developer",
       lead: "I build",
       words: ["search that finds the needle.", "payments for banking apps.", "integrations for sales CRMs.", "automated, stable deploys.", "AI into how teams ship."],
       sub: "Seven years shipping the business-critical parts of products across fintech, sales CRM and legal tech. From data to UI, with AI agents in the loop.",
-      ctaWork: "See my work", ctaEmail: "Copy email", location: "Brasília, Brazil", agnostic: "Language-agnostic", security: "Security-minded", ai: "AI-assisted development",
+      ctaWork: "See my work", ctaEmail: "Copy email", location: "Brasília, Brazil", security: "Security-minded", ai: "AI-assisted development",
       orbitHint: "Click a node to see the impact",
     },
     orbit: { search: "Search", payments: "Payments", integrations: "Integrations", deploys: "Deploys", ai: "AI", revenue: "Revenue", teams: "Teams", security: "Security" },
@@ -24,7 +24,7 @@ window.CONTENT = {
     impact: {
       title: "Impact", kicker: "What I deliver",
       cards: [
-        { id: "payments", icon: "bank", num: 7, suffix: "+", label: "banking apps", body: "Built at Dimensa (mobile2you) for client banks like Banco BV, Travelex, Dock and Bankly, with Pix live in production." },
+        { id: "payments", icon: "bank", num: 7, suffix: "+", label: "banking apps", body: "I contributed to their delivery at Dimensa (mobile2you), for client banks like Banco BV, Travelex, Dock and Bankly, with Pix live in production." },
         { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " yrs", label: "leading teams", body: "Two teams of 7 people at Dimensa, and a team of 7 at Ploomes." },
         { id: "integrations", icon: "plug", num: 13, suffix: "", label: "CRM integrations", body: "RD Station, ActiveCampaign, WhatsApp, Gmail, Outlook, Google Calendar, Mailchimp, Omie and more, built and maintained." },
         { id: "deploys", icon: "cycle", text: "Fragile → automated", body: "Deploys moved to automated CI/CD on Kubernetes, replacing manual releases that often broke and needed rollbacks." },
@@ -36,7 +36,7 @@ window.CONTENT = {
       title: "Experience", kicker: "Where I've been", more: "What I built", less: "Show less", current: "Current",
       education: { label: "Education", logo: "unb.svg", school: "Universidade de Brasília (UnB)", degree: "Bachelor's degree in Computer Science" },
       jobs: [
-        { mono: "H", logo: "laterallink.png", company: "LateralLink · Haistack", role: "Senior Full-Stack Developer", dates: "Oct 2026 – present · Oct 2022 – Nov 2024",
+        { mono: "H", logo: "laterallink.png", company: "LateralLink · Haistack", role: "Senior Full-Stack Developer", dates: "Oct 2022 – Nov 2024 · back since Oct 2026",
           headline: "Rebuilt the search and the revenue engine of a legal-recruiting CRM, and brought AI agents into the team's workflow.",
           tags: ["Ruby on Rails", "React", "TypeScript", "Elasticsearch", "Sidekiq", "AWS"], current: true,
           bullets: [
@@ -48,7 +48,7 @@ window.CONTENT = {
           ] },
         { mono: "P", logo: "ploomes.png", logoFull: true, company: "Ploomes", role: "Senior Full-Stack Developer", dates: "Nov 2024 – Oct 2026",
           headline: "Turned fragile deploys and undocumented integrations into an automated, stable and documented platform.",
-          tags: ["Kubernetes", "CI/CD", "Email", "Integrations", "Monolith"],
+          tags: ["C# / .NET", "Kafka", "RabbitMQ", "Redis", "Kubernetes", "CI/CD"],
           bullets: [
             "Replaced manual, unsafe deploys that often broke and needed rollbacks with <b>automated CI/CD on Kubernetes</b> for the email and integrations services, and made them stable.",
             "Consolidated the <b>email microservices into the monolith</b>, making the flow simpler to run and debug.",
@@ -60,19 +60,19 @@ window.CONTENT = {
             "Refactored legacy code for maintainability and security, and <b>informally led a team of 7 for four months</b>.",
           ] },
         { mono: "D", logo: "dimensa.png", logoOnDark: true, company: "Dimensa (mobile2you)", role: "Mid-level Developer · Team Lead", dates: "2019 – 2022",
-          headline: "Led two teams shipping 7+ white-label banking apps, with Pix payments and refunds in production.",
+          headline: "Led two teams working on 7+ white-label banking apps, with Pix payments and refunds in production.",
           tags: ["Mobile banking", "White-label", "Pix", "Team leadership"],
           bullets: [
             "<b>Led two teams</b> of 7 people for two and a half years.",
-            "At Dimensa (mobile2you), delivered <b>7+ white-label banking apps</b> for client banks such as <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> and <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, each tailored to the client's product and brand.",
+            "At Dimensa (mobile2you), contributed to the delivery of <b>7+ white-label banking apps</b> for client banks such as <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> and <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, each tailored to the client's product and brand.",
             "Worked on the <b>Dimensa app</b>, the rebuild of the white-label platform itself.",
             "Implemented <b>Pix</b> payments and refunds in the white-label core, live in production across the apps built on it.",
           ] },
       ],
     },
     stack: {
-      title: "Stack", kicker: "Language-agnostic",
-      pitch: "I pick the tool for the problem, not the other way around, and ramp up fast on new stacks. These are the ones I've shipped with.",
+      title: "Stack", kicker: "Toolbox",
+      pitch: "The languages, frameworks and infrastructure I've worked with.",
       filters: { all: "All", lang: "Languages", fw: "Frameworks", infra: "Data & infra" },
     },
     projects: {
@@ -80,7 +80,7 @@ window.CONTENT = {
       riposte: { kicker: "Game mod · Lua", title: "Riposte", body: "A timing circle for every enemy hit in Clair Obscur: Expedition 33, plus a grace period that turns near-misses into reduced damage instead of a full hit.", cta: "View on GitHub",
         play: "Try the mechanic", hint: "Press Space or tap when the ring meets the circle", start: "Tap to start", paused: "Paused · tap to play again",
         results: { perfect: "Perfect parry!", dodge: "Dodged!", grace: "Grace: reduced damage", miss: "Hit! Too early or too late" }, streak: "Streak", best: "Best" },
-      iped: { kicker: "Open source · Forensics · Java", title: "IPED", body: "The Brazilian Federal Police's digital forensics tool (3k+ stars). I wrote unit tests for its evidence parsers (RFC 822 email, P2P libraries) and its regex search, and fixed the bugs they uncovered.", cta: "View on GitHub" },
+      iped: { kicker: "Open source · Forensics · Java", title: "IPED", body: "The Brazilian Federal Police's digital forensics tool (3k+ stars). I wrote unit tests for its evidence parsers (RFC 822 email, P2P libraries) and its regex search, and fixed the bugs they uncovered.", cta: "View on GitHub", commits: "My commits", testsTitle: "Some of the parser tests I wrote" },
       academic: { title: "From the CS degree", items: [
         { name: "Pipelined MIPS CPU", meta: "VHDL", note: "hazard detection and forwarding units", link: "mips" },
         { name: "Compiler", meta: "C · Flex · Bison", note: "lexical, syntactic and semantic analysis", link: "compiler" },
@@ -104,16 +104,16 @@ window.CONTENT = {
   },
 
   pt: {
-    meta: { title: "Guilherme Andreúce · Desenvolvedor Full-Stack Sênior", description: "Construo as partes críticas de um produto: busca, receita, pagamentos, integrações e deploy, com IA no fluxo." },
-    nav: { impact: "Impacto", experience: "Experiência", stack: "Stack", security: "Segurança", projects: "Projetos", contact: "Contato", palette: "Buscar ou ir para…" },
-    a11y: { skip: "Pular para o conteúdo", sections: "Seções", menu: "Abrir menu", theme: "Alternar tema claro / escuro", lang: "EN: read in English",
+    meta: { title: "Guilherme Andreúce · Desenvolvedor Full-Stack", description: "Construo as partes críticas de um produto: busca, receita, pagamentos, integrações e deploy, com IA no fluxo." },
+    nav: { impact: "Impacto", experience: "Experiência", stack: "Stack", security: "Segurança", projects: "Projetos", contact: "Contato", palette: "Buscar ou ir para…", langLabel: "EN" },
+    a11y: { skip: "Pular para o conteúdo", sections: "Seções", menu: "Menu de seções", home: "Guilherme Andreúce, início", scroll: "Rolar para o conteúdo", theme: "Alternar tema claro / escuro", lang: "EN: read in English",
       palette: "Paleta de comandos", paletteInput: "Buscar comandos e seções", filters: "Filtrar tecnologias", game: "Jogo de timing do Riposte: aperte para jogar", coin: "Vire a moeda: de um lado eu, do outro um dos meus gatos" },
     hero: {
-      eyebrow: "Desenvolvedor Full-Stack Sênior",
+      eyebrow: "Desenvolvedor Full-Stack",
       lead: "Eu construo",
       words: ["buscas que acham a agulha.", "pagamentos para apps bancários.", "integrações para CRMs de vendas.", "deploys automatizados e estáveis.", "IA no jeito do time entregar."],
       sub: "Sete anos entregando as partes críticas de produtos em fintech, CRM de vendas e legal tech. Dos dados à interface, com agentes de IA no fluxo.",
-      ctaWork: "Ver meu trabalho", ctaEmail: "Copiar e-mail", location: "Brasília, Brasil", agnostic: "Agnóstico a linguagem", security: "Foco em segurança", ai: "Desenvolvimento com IA",
+      ctaWork: "Ver meu trabalho", ctaEmail: "Copiar e-mail", location: "Brasília, Brasil", security: "Foco em segurança", ai: "Desenvolvimento com IA",
       orbitHint: "Clique num nó para ver o impacto",
     },
     orbit: { search: "Busca", payments: "Pagamentos", integrations: "Integrações", deploys: "Deploys", ai: "IA", revenue: "Receita", teams: "Times", security: "Segurança" },
@@ -127,7 +127,7 @@ window.CONTENT = {
     impact: {
       title: "Impacto", kicker: "O que eu entrego",
       cards: [
-        { id: "payments", icon: "bank", num: 7, suffix: "+", label: "apps bancários", body: "Desenvolvidos na Dimensa (mobile2you) para bancos clientes como Banco BV, Travelex, Dock e Bankly, com Pix em produção." },
+        { id: "payments", icon: "bank", num: 7, suffix: "+", label: "apps bancários", body: "Contribuí para a entrega deles na Dimensa (mobile2you), para bancos clientes como Banco BV, Travelex, Dock e Bankly, com Pix em produção." },
         { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " anos", label: "liderando times", body: "Dois times de 7 pessoas na Dimensa e um time de 7 pessoas na Ploomes." },
         { id: "integrations", icon: "plug", num: 13, suffix: "", label: "integrações de CRM", body: "RD Station, ActiveCampaign, WhatsApp, Gmail, Outlook, Google Agenda, Mailchimp, Omie e outras, construídas e mantidas." },
         { id: "deploys", icon: "cycle", text: "Frágil → automatizado", body: "Deploys levados para CI/CD automatizado no Kubernetes, no lugar de releases manuais que quebravam e exigiam rollback." },
@@ -139,7 +139,7 @@ window.CONTENT = {
       title: "Experiência", kicker: "Por onde passei", more: "O que construí", less: "Mostrar menos", current: "Atual",
       education: { label: "Formação", logo: "unb.svg", school: "Universidade de Brasília (UnB)", degree: "Bacharelado em Ciência da Computação" },
       jobs: [
-        { mono: "H", logo: "laterallink.png", company: "LateralLink · Haistack", role: "Desenvolvedor Full-Stack Sênior", dates: "out/2026 – atual · out/2022 – nov/2024",
+        { mono: "H", logo: "laterallink.png", company: "LateralLink · Haistack", role: "Desenvolvedor Full-Stack Sênior", dates: "out/2022 – nov/2024 · de volta desde out/2026",
           headline: "Reconstruí a busca e o motor de receita de um CRM de recrutamento jurídico, e trouxe agentes de IA para o fluxo do time.",
           tags: ["Ruby on Rails", "React", "TypeScript", "Elasticsearch", "Sidekiq", "AWS"], current: true,
           bullets: [
@@ -151,7 +151,7 @@ window.CONTENT = {
           ] },
         { mono: "P", logo: "ploomes.png", logoFull: true, company: "Ploomes", role: "Desenvolvedor Full-Stack Sênior", dates: "nov/2024 – out/2026",
           headline: "Transformei deploys frágeis e integrações sem documentação em uma plataforma automatizada, estável e documentada.",
-          tags: ["Kubernetes", "CI/CD", "E-mail", "Integrações", "Monolito"],
+          tags: ["C# / .NET", "Kafka", "RabbitMQ", "Redis", "Kubernetes", "CI/CD"],
           bullets: [
             "Troquei deploys manuais e inseguros, que quebravam e viviam de rollback, por <b>CI/CD automatizado no Kubernetes</b> para os serviços de e-mail e integrações, e deixei tudo estável.",
             "Consolidei os <b>microsserviços de e-mail no monolito</b>, deixando o fluxo mais simples de operar e depurar.",
@@ -163,19 +163,19 @@ window.CONTENT = {
             "Refatorei código legado com foco em manutenibilidade e segurança, e <b>liderei informalmente um time de 7 pessoas por quatro meses</b>.",
           ] },
         { mono: "D", logo: "dimensa.png", logoOnDark: true, company: "Dimensa (mobile2you)", role: "Desenvolvedor Pleno · Líder de time", dates: "2019 – 2022",
-          headline: "Liderei dois times entregando 7+ apps bancários white-label, com Pix e devolução de Pix em produção.",
+          headline: "Liderei dois times trabalhando em 7+ apps bancários white-label, com Pix e devolução de Pix em produção.",
           tags: ["Mobile banking", "White-label", "Pix", "Liderança"],
           bullets: [
             "<b>Liderei dois times</b> de 7 pessoas por dois anos e meio.",
-            "Pela Dimensa (mobile2you), entreguei <b>7+ apps bancários white-label</b> para bancos clientes como <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> e <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, cada um adaptado ao produto e à marca do cliente.",
+            "Pela Dimensa (mobile2you), contribuí com a entrega de <b>7+ apps bancários white-label</b> para bancos clientes como <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> e <a href=\"https://bancobbcdigital.com.br\" target=\"_blank\" rel=\"noopener\">Banco BBC Digital</a>, cada um adaptado ao produto e à marca do cliente.",
             "Trabalhei no <b>app Dimensa</b>, a reformulação da própria plataforma white-label.",
             "Implementei <b>Pix</b> e devolução de Pix no núcleo white-label, em produção em todos os apps construídos sobre ele.",
           ] },
       ],
     },
     stack: {
-      title: "Stack", kicker: "Agnóstico a linguagem",
-      pitch: "Escolho a ferramenta pelo problema, e não o contrário, e fico produtivo rápido em stacks novas. Estas são as que já usei para entregar.",
+      title: "Stack", kicker: "Caixa de ferramentas",
+      pitch: "As linguagens, frameworks e infraestrutura com que já trabalhei.",
       filters: { all: "Todas", lang: "Linguagens", fw: "Frameworks", infra: "Dados e infra" },
     },
     projects: {
@@ -183,7 +183,7 @@ window.CONTENT = {
       riposte: { kicker: "Mod de jogo · Lua", title: "Riposte", body: "Um círculo de timing para cada golpe inimigo em Clair Obscur: Expedition 33, e uma janela de tolerância que transforma quase-acertos em dano reduzido.", cta: "Ver no GitHub",
         play: "Teste a mecânica", hint: "Aperte Espaço ou toque quando o anel encostar no círculo", start: "Toque para começar", paused: "Pausado · toque para jogar de novo",
         results: { perfect: "Parry perfeito!", dodge: "Esquivou!", grace: "Tolerância: dano reduzido", miss: "Acertou você! Cedo ou tarde demais" }, streak: "Sequência", best: "Recorde" },
-      iped: { kicker: "Open source · Perícia · Java", title: "IPED", body: "A ferramenta de perícia digital da Polícia Federal (3k+ estrelas). Escrevi testes unitários para os parsers de evidência (e-mail RFC 822, bibliotecas de P2P) e para a busca por regex, e corrigi os bugs que eles revelaram.", cta: "Ver no GitHub" },
+      iped: { kicker: "Open source · Perícia · Java", title: "IPED", body: "A ferramenta de perícia digital da Polícia Federal (3k+ estrelas). Escrevi testes unitários para os parsers de evidência (e-mail RFC 822, bibliotecas de P2P) e para a busca por regex, e corrigi os bugs que eles revelaram.", cta: "Ver no GitHub", commits: "Meus commits", testsTitle: "Alguns dos testes de parser que escrevi" },
       academic: { title: "Da graduação", items: [
         { name: "CPU MIPS com pipeline", meta: "VHDL", note: "unidades de detecção de hazard e forwarding", link: "mips" },
         { name: "Compilador", meta: "C · Flex · Bison", note: "análise léxica, sintática e semântica", link: "compiler" },
@@ -215,6 +215,7 @@ window.LINKS = {
   telegram: "https://t.me/guileb",
   riposte: "https://github.com/streeg/Riposte",
   iped: "https://github.com/sepinf-inc/IPED",
+  ipedCommits: "https://github.com/sepinf-inc/IPED/commits?author=streeg",
   thesis: "https://github.com/streeg/tcc",
   mips: "https://github.com/streeg/oac20191unb2",
   compiler: "https://github.com/streeg/guillex2",
@@ -224,10 +225,11 @@ window.LINKS = {
 
 window.STACK = [
   { id: "ts", name: "TypeScript", cat: "lang" }, { id: "js", name: "JavaScript", cat: "lang" }, { id: "ruby", name: "Ruby", cat: "lang" },
-  { id: "python", name: "Python", cat: "lang" }, { id: "java", name: "Java", cat: "lang" }, { id: "lua", name: "Lua", cat: "lang" },
-  { id: "rails", name: "Rails", cat: "fw" }, { id: "react", name: "React", cat: "fw" }, { id: "nodejs", name: "Node.js", cat: "fw" },
+  { id: "python", name: "Python", cat: "lang" }, { id: "java", name: "Java", cat: "lang" }, { id: "cs", name: "C#", cat: "lang" }, { id: "lua", name: "Lua", cat: "lang" },
+  { id: "rails", name: "Rails", cat: "fw" }, { id: "dotnet", name: ".NET", cat: "fw" }, { id: "react", name: "React", cat: "fw" }, { id: "nodejs", name: "Node.js", cat: "fw" },
   { id: "vue", name: "Vue", cat: "fw" }, { id: "angular", name: "Angular", cat: "fw" },
-  { id: "elasticsearch", name: "Elasticsearch", cat: "infra" }, { id: "redis", name: "Redis", cat: "infra" }, { id: "aws", name: "AWS", cat: "infra" },
+  { id: "elasticsearch", name: "Elasticsearch", cat: "infra" }, { id: "redis", name: "Redis", cat: "infra" }, { id: "kafka", name: "Kafka", cat: "infra" },
+  { id: "rabbitmq", name: "RabbitMQ", cat: "infra" }, { id: "aws", name: "AWS", cat: "infra" },
   { id: "docker", name: "Docker", cat: "infra" }, { id: "kubernetes", name: "Kubernetes", cat: "infra" },
   { id: "git", name: "Git", cat: "infra" }, { id: "linux", name: "Linux", cat: "infra" },
 ];

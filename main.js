@@ -1,6 +1,8 @@
 (() => {
   "use strict";
-  const C = window.CONTENT, L = window.LINKS, STACK = window.STACK;
+  // The HTML arrives already rendered by build.mjs; this script adds the interactive layer
+  // and re-renders the content blocks (with the same builders, render.js) when the language changes.
+  const C = window.CONTENT, L = window.LINKS, STACK = window.STACK, R = window.RENDER;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -12,24 +14,12 @@
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const smooth = () => (reduced ? "auto" : "smooth");
 
-  const ICONS = {
-    bank: '<path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>',
-    users: '<path d="M9 11.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4ZM3 19.5c0-3.3 2.7-5.6 6-5.6s6 2.3 6 5.6M16.5 11.5a2.6 2.6 0 1 0 0-5.2M17 14.2c2.4.3 4 2.1 4 4.8"/>',
-    plug: '<path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0ZM12 17v4"/>',
-    cycle: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4.5H15"/>',
-    search: '<path d="M10.8 17.6a6.8 6.8 0 1 0 0-13.6 6.8 6.8 0 0 0 0 13.6ZM15.8 15.8 21 21"/>',
-    chart: '<path d="M3 17l6-6 4 4 8-8M15 7h6v6M3 21h18"/>',
-    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
-    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M5 5l1.5 1.5M17.5 17.5 19 19M3 12h2M19 12h2M5 19l1.5-1.5M17.5 6.5 19 5"/>',
-    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3Z"/>',
-    copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
-    out: '<path d="M7 17 17 7M9 7h8v8"/>',
-    game: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
-  };
-  const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
+  const svg = R.svg;
 
   // ================================================================ language
-  let lang = store.get("lang") || ((navigator.language || "en").toLowerCase().startsWith("pt") ? "pt" : "en");
+  // The URL decides the language: / is English, /pt/ is Portuguese (the head script already sent
+  // a Portuguese reader with no saved choice from / to /pt/). The toggle switches in place and updates the URL.
+  let lang = document.documentElement.lang.startsWith("pt") ? "pt" : "en";
   const t = (path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), C[lang]);
   let booted = false;   // after first paint, re-rendered content appears without the entrance animation
 
@@ -40,17 +30,19 @@
     $$("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
     $$("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
     $$("[data-i18n-alt]").forEach((el) => el.setAttribute("alt", t(el.dataset.i18nAlt)));
-    $("#lang-label").textContent = lang === "pt" ? "EN" : "PT";
-    $("#toggle-lang").setAttribute("aria-label", t("a11y.lang"));
-    $("#email-link").textContent = L.email;
-    $("#typed-sr").textContent = `${t("hero.lead")} ${t("hero.words").map((w) => w.replace(/\.$/, "")).join(", ")}.`;
-    $("#palette-input").placeholder = t("palette.placeholder");
+    $$("[data-i18n-ph]").forEach((el) => el.setAttribute("placeholder", t(el.dataset.i18nPh)));
+    $("#typed-sr").textContent = R.typedSentence(C[lang]);
     renderImpact(); renderJobs(); renderFilters(); renderStack(); renderSecurity(); renderAcademic(); restartTyped();
     game.relabel();
     if (!pal.hidden) renderPalette();
     observeReveals();
   }
-  $("#toggle-lang").addEventListener("click", () => { lang = lang === "pt" ? "en" : "pt"; store.set("lang", lang); applyLang(); });
+  $("#toggle-lang").addEventListener("click", () => {
+    lang = lang === "pt" ? "en" : "pt";
+    store.set("lang", lang);
+    applyLang();
+    try { history.replaceState(null, "", (lang === "pt" ? "/pt/" : "/") + location.search + location.hash); } catch (e) { /* file:// or sandboxed */ }
+  });
 
   // ================================================================ theme
   function setTheme(next) {
@@ -63,8 +55,7 @@
   const toggleTheme = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
   $("#toggle-theme").addEventListener("click", toggleTheme);
 
-  // ================================================================ links, email, toast
-  $$("[data-link]").forEach((a) => { a.href = L[a.dataset.link]; });
+  // ================================================================ email, toast
   let toastTimer;
   function toast(msg) {
     const el = $("#toast"); el.textContent = msg; el.classList.add("show");
@@ -96,16 +87,8 @@
   }
 
   // ================================================================ impact
-  const revealedClass = () => (booted ? " in" : "");
   function renderImpact() {
-    $("#impact-grid").innerHTML = t("impact.cards").map((c, i) => `
-      <article class="impact-card spot reveal${revealedClass()}" style="--d:${(i % 3) * 0.08}s" id="impact-${c.id}" data-tilt>
-        <div class="impact-icon">${svg(c.icon)}</div>
-        ${c.num != null
-          ? `<p class="impact-big">${c.prefix ? `<span class="num">${c.prefix}</span>` : ""}<span class="num" data-count="${c.num}">${booted || reduced ? c.num : 0}</span><span class="num">${c.suffix}</span></p><p class="impact-label">${c.label}</p>`
-          : `<p class="impact-big text">${c.text}</p>`}
-        <p class="impact-body">${c.body}</p>
-      </article>`).join("");
+    $("#impact-grid").innerHTML = R.impact(C[lang], { revealed: booted, counting: !booted && !reduced });
     if (booted) $$("[data-count]").forEach((n) => (n.dataset.done = "1"));
     bindCards();
   }
@@ -120,32 +103,9 @@
 
   // ================================================================ experience
   const openJobs = new Set();
-  function logoTile(j) {
-    if (!j.logo) return `<div class="job-mono" aria-hidden="true">${j.mono}</div>`;
-    return `<div class="job-mono logo${j.logoFull ? " full" : ""}${j.logoOnDark ? " on-dark" : ""}" aria-hidden="true"><img src="assets/logos/${j.logo}" alt="" width="58" height="58"></div>`;
-  }
   function renderJobs() {
-    const ex = C[lang].experience, edu = ex.education;
-    $("#jobs").innerHTML = ex.jobs.map((j, i) => {
-      const open = openJobs.has(i);
-      return `
-      <article class="job spot reveal${revealedClass()}${open ? " open" : ""}" style="--d:${i * 0.06}s" data-i="${i}">
-        <div class="job-head">
-          ${logoTile(j)}
-          <div>
-            <h3 class="job-title">${j.company}${j.current ? `<span class="badge">${ex.current}</span>` : ""}</h3>
-            <p class="job-meta"><b>${j.role}</b> · ${j.dates}</p>
-            <p class="job-headline">${j.headline}</p>
-            <ul class="tags">${j.tags.map((x) => `<li>${x}</li>`).join("")}</ul>
-            <button class="job-toggle" type="button" aria-expanded="${open}" aria-controls="job-${i}"><span>${open ? ex.less : ex.more}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-            <div class="job-details" id="job-${i}"><div><ul>${j.bullets.map((b) => `<li>${b}</li>`).join("")}</ul></div></div>
-          </div>
-        </div>
-      </article>`; }).join("") + `
-      <article class="job edu spot reveal${revealedClass()}">
-        <div class="job-mono logo" aria-hidden="true"><img src="assets/logos/${edu.logo}" alt="" width="58" height="58"></div>
-        <div><p class="edu-label">${edu.label}</p><h3 class="edu-school">${edu.school}</h3><p class="edu-degree">${edu.degree}</p></div>
-      </article>`;
+    const ex = C[lang].experience;
+    $("#jobs").innerHTML = R.jobs(C[lang], { revealed: booted, open: openJobs });
     $$(".job-toggle").forEach((btn) => btn.addEventListener("click", () => {
       const job = btn.closest(".job"), i = +job.dataset.i, open = !job.classList.contains("open");
       job.classList.toggle("open", open); btn.setAttribute("aria-expanded", open);
@@ -159,8 +119,7 @@
   // ================================================================ stack
   let filter = "all";
   function renderFilters() {
-    const f = t("stack.filters");
-    $("#filters").innerHTML = Object.keys(f).map((k) => `<button class="filter" type="button" data-f="${k}" aria-pressed="${k === filter}">${f[k]}</button>`).join("");
+    $("#filters").innerHTML = R.filters(C[lang], filter);
     $$(".filter").forEach((b) => b.addEventListener("click", () => {
       filter = b.dataset.f;
       $$(".filter").forEach((x) => x.setAttribute("aria-pressed", x === b));
@@ -168,30 +127,15 @@
     }));
   }
   function renderStack() {
-    $("#stack-grid").innerHTML = STACK.map((s, i) => `
-      <li class="tech reveal${revealedClass()}" style="--d:${(i % 6) * 0.04}s" data-cat="${s.cat}">
-        <img class="ic-dark" src="assets/icons/${s.id}-dark.svg" alt="" width="48" height="48" loading="lazy">
-        <img class="ic-light" src="assets/icons/${s.id}-light.svg" alt="" width="48" height="48" loading="lazy">
-        <span>${s.name}</span>
-      </li>`).join("");
+    $("#stack-grid").innerHTML = R.stack(STACK, { revealed: booted });
     applyFilter();
   }
   function applyFilter() { $$(".tech").forEach((el) => el.classList.toggle("dim", filter !== "all" && el.dataset.cat !== filter)); }
 
   // ================================================================ security + academic projects
-  function renderSecurity() {
-    $("#thesis-tags").innerHTML = t("security.thesis.tags").map((x) => `<li>${x}</li>`).join("");
-  }
+  function renderSecurity() { $("#thesis-tags").innerHTML = R.thesisTags(C[lang]); }
   function renderAcademic() {
-    $("#academic").innerHTML = t("projects.academic.items").map((a, i) => `
-      <li class="reveal${revealedClass()}" style="--d:${i * 0.06}s">
-        <a class="acad spot" href="${L[a.link]}" target="_blank" rel="noopener">
-          <span class="acad-meta">${a.meta}</span>
-          <span class="acad-name">${a.name}</span>
-          <span class="acad-note">${a.note}</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </a>
-      </li>`).join("");
+    $("#academic").innerHTML = R.academic(C[lang], L, { revealed: booted });
     bindCards();
   }
 
@@ -478,7 +422,6 @@
   function runSel() { const c = items[sel]; if (!c) return; closePalette(); c.run(); }
   function move(delta) { if (!items.length) return; sel = (sel + delta + items.length) % items.length; renderPalette(); }
   $("#open-palette").addEventListener("click", openPalette);
-  $("#open-menu").addEventListener("click", openPalette);
   input.addEventListener("input", () => { sel = 0; renderPalette(); });
   pal.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
@@ -494,7 +437,22 @@
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); pal.hidden ? openPalette() : closePalette(); }
     else if (e.key === "/" && pal.hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) { e.preventDefault(); openPalette(); }
   });
-  if (!/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $$("kbd").forEach((k) => { if (k.textContent === "⌘K") k.textContent = "Ctrl K"; });
+  const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent;
+  if (!/Mac|iPhone|iPad|iOS/i.test(platform)) $$("kbd").forEach((k) => { if (k.textContent === "⌘K") k.textContent = "Ctrl K"; });
+
+  // ================================================================ mobile menu: a plain list of the sections
+  const menu = $("#mobile-menu"), menuBtn = $("#open-menu");
+  function setMenu(open, refocus) {
+    menu.hidden = !open;
+    menuBtn.setAttribute("aria-expanded", String(open));
+    if (open) menu.querySelector("a").focus();
+    else if (refocus) menuBtn.focus();
+  }
+  menuBtn.addEventListener("click", () => setMenu(menu.hidden));
+  menu.addEventListener("click", (e) => { if (e.target.closest("a")) setMenu(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) setMenu(false, true); });
+  document.addEventListener("click", (e) => { if (!menu.hidden && !e.target.closest("#mobile-menu, #open-menu")) setMenu(false); });
+  menu.addEventListener("focusout", (e) => { if (!menu.hidden && e.relatedTarget && !e.relatedTarget.closest("#mobile-menu, #open-menu")) setMenu(false); });
 
   // ================================================================ reduced-motion changes at runtime
   motionQuery.addEventListener("change", (e) => { reduced = e.matches; restartTyped(); syncStars(); if (reduced) $$(".reveal").forEach((el) => el.classList.add("in")); });
