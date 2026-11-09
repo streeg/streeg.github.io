@@ -8,7 +8,7 @@ window.CONTENT = {
     hero: {
       eyebrow: "Senior Full-Stack Developer",
       lead: "I build",
-      words: ["search that finds the needle.", "payments that just work.", "integrations that don't break.", "deploys you can trust.", "AI into how teams ship."],
+      words: ["search that finds the needle.", "payments for banking apps.", "integrations for sales CRMs.", "automated, stable deploys.", "AI into how teams ship."],
       sub: "Seven years shipping the business-critical parts of products across fintech, sales CRM and legal tech. From data to UI, with AI agents in the loop.",
       ctaWork: "See my work", ctaEmail: "Copy email", location: "Brasília, Brazil", agnostic: "Language-agnostic", security: "Security-minded", ai: "AI-assisted development",
       orbitHint: "Click a node to see the impact",
@@ -32,10 +32,10 @@ window.CONTENT = {
       title: "Impact", kicker: "What I deliver",
       cards: [
         { id: "payments", icon: "bank", num: 7, suffix: "+", label: "banking apps", body: "Built at Dimensa (mobile2you) for client banks like Banco BV, Travelex, Dock and Bankly, with Pix live in production." },
-        { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " yrs", label: "leading teams", body: "Two teams of 6–7 developers at Dimensa, and a team of 7 at Ploomes." },
+        { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " yrs", label: "leading teams", body: "Two teams of 7 people at Dimensa, and a team of 7 at Ploomes." },
         { id: "integrations", icon: "plug", num: 12, suffix: "", label: "CRM integrations", body: "RD Station, WhatsApp, Gmail, Outlook, Google Calendar, Mailchimp, Omie, Zenvia and more, built and maintained." },
-        { id: "deploys", icon: "cycle", text: "Fragile → automated", body: "Deploys moved to CI/CD on Kubernetes: no more manual releases, breakages and rollbacks." },
-        { id: "search", icon: "search", text: "Sphinx → Elasticsearch", body: "Platform search rebuilt and made dramatically faster, with highlighted keyword matches." },
+        { id: "deploys", icon: "cycle", text: "Fragile → automated", body: "Deploys moved to automated CI/CD on Kubernetes, replacing manual releases that often broke and needed rollbacks." },
+        { id: "search", icon: "search", text: "Sphinx → Elasticsearch", body: "Platform search migrated to Elasticsearch, with keyword search and highlighted matches." },
         { id: "revenue", icon: "chart", text: "Revenue engine", body: "Built the placements module that runs the firm's placement revenue and commissions." },
       ],
     },
@@ -47,7 +47,7 @@ window.CONTENT = {
           headline: "Rebuilt the search and the revenue engine of a legal-recruiting CRM, and brought AI agents into the team's workflow.",
           tags: ["Ruby on Rails", "React", "TypeScript", "Elasticsearch", "Sidekiq", "AWS"], current: true,
           bullets: [
-            "Migrated platform search from Sphinx to <b>Elasticsearch</b> and made it <b>dramatically faster</b>, then added keyword search with highlighted matches across candidates, notes, emails and submissions.",
+            "Migrated platform search from Sphinx to <b>Elasticsearch</b>, then added keyword search with highlighted matches across candidates, notes, emails and submissions.",
             "Built the <b>placements module</b> that runs the firm's placement revenue: commission splits, signing bonuses and deal notifications.",
             "Hardened <b>security</b> with SMS two-factor authentication, an API key lifecycle, vendor permission rules and CSV formula-injection protection.",
             "Shipped <b>LLM features</b> in the CRM, such as candidate recommendations and AI-drafted recruiter emails.",
@@ -58,7 +58,7 @@ window.CONTENT = {
           tags: ["Kubernetes", "CI/CD", "Email", "Integrations", "Monolith"],
           bullets: [
             "Replaced manual, unsafe deploys that often broke and needed rollbacks with <b>automated CI/CD on Kubernetes</b> for the email and integrations services, and made them stable.",
-            "Consolidated the <b>email microservices into the monolith</b>, drastically cutting debugging time.",
+            "Consolidated the <b>email microservices into the monolith</b>, making the flow simpler to run and debug.",
             "Built and maintained <a href=\"https://www.ploomes.com/produto/integracoes\" target=\"_blank\" rel=\"noopener\"><b>12 CRM integrations</b></a>: RD Station, Neppo, Flowbiz, WhatsApp, Facebook Lead Ads, Mailchimp, Meetime, Omie, Outlook, Gmail, Google Calendar and Zenvia.",
             "Wrote the <b>missing documentation</b> for the email and integrations domains and created operational routines for them.",
             "Refactored legacy code for maintainability and security, and <b>informally led a team of 7 for four months</b>.",
@@ -67,7 +67,7 @@ window.CONTENT = {
           headline: "Led two teams shipping 7+ white-label banking apps, with Pix payments and refunds in production.",
           tags: ["Mobile banking", "White-label", "Pix", "Team leadership"],
           bullets: [
-            "<b>Led two teams</b> of 6–7 developers for two and a half years.",
+            "<b>Led two teams</b> of 7 people for two and a half years.",
             "At Dimensa (mobile2you), delivered <b>7+ white-label banking apps</b> for client banks such as <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> and BBC Caminhoneiros, each tailored to the client's product and brand.",
             "Worked on the <b>Dimensa app</b>, the rebuild of the white-label platform itself.",
             "Implemented <b>Pix</b> payments and refunds in the white-label core, live in production across the apps built on it.",
@@ -115,7 +115,7 @@ window.CONTENT = {
     hero: {
       eyebrow: "Desenvolvedor Full-Stack Sênior",
       lead: "Eu construo",
-      words: ["buscas que acham a agulha.", "pagamentos que simplesmente funcionam.", "integrações que não quebram.", "deploys em que dá pra confiar.", "IA no jeito do time entregar."],
+      words: ["buscas que acham a agulha.", "pagamentos para apps bancários.", "integrações para CRMs de vendas.", "deploys automatizados e estáveis.", "IA no jeito do time entregar."],
       sub: "Sete anos entregando as partes críticas de produtos em fintech, CRM de vendas e legal tech. Dos dados à interface, com agentes de IA no fluxo.",
       ctaWork: "Ver meu trabalho", ctaEmail: "Copiar e-mail", location: "Brasília, Brasil", agnostic: "Agnóstico a linguagem", security: "Foco em segurança", ai: "Desenvolvimento com IA",
       orbitHint: "Clique num nó para ver o impacto",
@@ -139,10 +139,10 @@ window.CONTENT = {
       title: "Impacto", kicker: "O que eu entrego",
       cards: [
         { id: "payments", icon: "bank", num: 7, suffix: "+", label: "apps bancários", body: "Desenvolvidos na Dimensa (mobile2you) para bancos clientes como Banco BV, Travelex, Dock e Bankly, com Pix em produção." },
-        { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " anos", label: "liderando times", body: "Dois times de 6 a 7 devs na Dimensa e um time de 7 pessoas na Ploomes." },
+        { id: "teams", icon: "users", prefix: "~", num: 3, suffix: " anos", label: "liderando times", body: "Dois times de 7 pessoas na Dimensa e um time de 7 pessoas na Ploomes." },
         { id: "integrations", icon: "plug", num: 12, suffix: "", label: "integrações de CRM", body: "RD Station, WhatsApp, Gmail, Outlook, Google Agenda, Mailchimp, Omie, Zenvia e outras, construídas e mantidas." },
-        { id: "deploys", icon: "cycle", text: "Frágil → automatizado", body: "Deploys levados para CI/CD no Kubernetes: sem releases manuais, quebras e rollbacks." },
-        { id: "search", icon: "search", text: "Sphinx → Elasticsearch", body: "Busca da plataforma reconstruída e absurdamente mais rápida, com destaque dos termos." },
+        { id: "deploys", icon: "cycle", text: "Frágil → automatizado", body: "Deploys levados para CI/CD automatizado no Kubernetes, no lugar de releases manuais que quebravam e exigiam rollback." },
+        { id: "search", icon: "search", text: "Sphinx → Elasticsearch", body: "Busca da plataforma migrada para Elasticsearch, com busca por palavra-chave e destaque dos termos." },
         { id: "revenue", icon: "chart", text: "Motor de receita", body: "Construí o módulo de contratações que gere a receita e as comissões do escritório." },
       ],
     },
@@ -154,7 +154,7 @@ window.CONTENT = {
           headline: "Reconstruí a busca e o motor de receita de um CRM de recrutamento jurídico, e trouxe agentes de IA para o fluxo do time.",
           tags: ["Ruby on Rails", "React", "TypeScript", "Elasticsearch", "Sidekiq", "AWS"], current: true,
           bullets: [
-            "Migrei a busca da plataforma de Sphinx para <b>Elasticsearch</b> e a deixei <b>absurdamente mais rápida</b>; depois adicionei busca por palavra-chave, com os termos destacados, em candidatos, notas, e-mails e submissões.",
+            "Migrei a busca da plataforma de Sphinx para <b>Elasticsearch</b> e depois adicionei busca por palavra-chave, com os termos destacados, em candidatos, notas, e-mails e submissões.",
             "Construí o <b>módulo de contratações</b> que gere a receita das contratações do escritório: divisão de comissões, bônus de assinatura e notificações de cada negociação.",
             "Reforcei a <b>segurança</b> com autenticação em dois fatores por SMS, ciclo de vida de chaves de API, regras de permissão para fornecedores e proteção contra injeção de fórmulas em CSV.",
             "Entreguei <b>funcionalidades com LLM</b> no CRM, como recomendação de candidatos e e-mails de recrutadores redigidos por IA.",
@@ -165,7 +165,7 @@ window.CONTENT = {
           tags: ["Kubernetes", "CI/CD", "E-mail", "Integrações", "Monolito"],
           bullets: [
             "Troquei deploys manuais e inseguros, que quebravam e viviam de rollback, por <b>CI/CD automatizado no Kubernetes</b> para os serviços de e-mail e integrações, e deixei tudo estável.",
-            "Consolidei os <b>microsserviços de e-mail no monolito</b>, reduzindo drasticamente o tempo de depuração.",
+            "Consolidei os <b>microsserviços de e-mail no monolito</b>, deixando o fluxo mais simples de operar e depurar.",
             "Construí e mantive <a href=\"https://www.ploomes.com/produto/integracoes\" target=\"_blank\" rel=\"noopener\"><b>12 integrações do CRM</b></a>: RD Station, Neppo, Flowbiz, WhatsApp, Facebook Lead Ads, Mailchimp, Meetime, Omie, Outlook, Gmail, Google Agenda e Zenvia.",
             "Escrevi a <b>documentação que não existia</b> dos domínios de e-mail e integrações e criei rotinas operacionais para eles.",
             "Refatorei código legado com foco em manutenibilidade e segurança, e <b>liderei informalmente um time de 7 pessoas por quatro meses</b>.",
@@ -174,7 +174,7 @@ window.CONTENT = {
           headline: "Liderei dois times entregando 7+ apps bancários white-label, com Pix e devolução de Pix em produção.",
           tags: ["Mobile banking", "White-label", "Pix", "Liderança"],
           bullets: [
-            "<b>Liderei dois times</b> de 6 a 7 devs por dois anos e meio.",
+            "<b>Liderei dois times</b> de 7 pessoas por dois anos e meio.",
             "Pela Dimensa (mobile2you), entreguei <b>7+ apps bancários white-label</b> para bancos clientes como <a href=\"https://www.bv.com.br\" target=\"_blank\" rel=\"noopener\">Banco BV</a>, <a href=\"https://www.travelexbank.com.br\" target=\"_blank\" rel=\"noopener\">Travelex Bank</a>, <a href=\"https://dock.tech\" target=\"_blank\" rel=\"noopener\">Dock</a>, <a href=\"https://bankly.com.br\" target=\"_blank\" rel=\"noopener\">Bankly (Acesso)</a> e BBC Caminhoneiros, cada um adaptado ao produto e à marca do cliente.",
             "Trabalhei no <b>app Dimensa</b>, a reformulação da própria plataforma white-label.",
             "Implementei <b>Pix</b> e devolução de Pix no núcleo white-label, em produção em todos os apps construídos sobre ele.",
