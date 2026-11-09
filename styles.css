@@ -66,7 +66,9 @@ kbd { font: 500 .78em var(--mono); padding: .15em .45em; border: 1px solid var(-
 }
 .nav.scrolled { background: var(--glass); border-color: var(--line); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); box-shadow: var(--shadow); }
 .brand { display: flex; align-items: center; gap: 10px; font: 600 15px var(--display); }
-.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: var(--grad); color: #fff; font-size: 13px; letter-spacing: .5px; box-shadow: 0 6px 20px -6px rgba(var(--tint),.7); }
+.brand-mark { display: block; flex: none; width: 36px; height: 36px; padding: 2px; border-radius: 50%; background: var(--grad); box-shadow: 0 6px 20px -6px rgba(var(--tint),.7); transition: transform .3s cubic-bezier(.3,1.35,.45,1); }
+.brand-mark img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); }
+.brand:hover .brand-mark, .brand:focus-visible .brand-mark { transform: scale(1.08) rotate(-4deg); }
 .nav-links { display: flex; gap: 4px; margin-left: auto; }
 .nav-links a { padding: 8px 12px; border-radius: 10px; color: var(--muted); font-size: 14px; font-weight: 500; transition: color .2s, background .2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface-2); }
