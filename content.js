@@ -98,7 +98,7 @@ window.CONTENT = {
       body: "Always up for a conversation about product engineering, search, integrations or AI-assisted development.",
       email: "Copy email", copied: "Copied:", copyFailed: "Email:",
     },
-    footer: "Hand-built with HTML, CSS and vanilla JS. Press",
+    footer: "Built with HTML, CSS and vanilla JS, no framework. Press",
     footer2: "to explore.",
     palette: {
       placeholder: "Type a command or section…", empty: "No results",
@@ -205,7 +205,7 @@ window.CONTENT = {
       body: "Sempre aberto a uma conversa sobre engenharia de produto, busca, integrações ou desenvolvimento assistido por IA.",
       email: "Copiar e-mail", copied: "Copiado:", copyFailed: "E-mail:",
     },
-    footer: "Feito à mão com HTML, CSS e JavaScript puro. Aperte",
+    footer: "Feito com HTML, CSS e JavaScript puro, sem framework. Aperte",
     footer2: "para explorar.",
     palette: {
       placeholder: "Digite um comando ou seção…", empty: "Nada encontrado",
