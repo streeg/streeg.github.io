@@ -181,7 +181,6 @@
   // ================================================================ security + academic projects
   function renderSecurity() {
     $("#thesis-tags").innerHTML = t("security.thesis.tags").map((x) => `<li>${x}</li>`).join("");
-    $("#sec-prod-list").innerHTML = t("security.prod.items").map((x) => `<li>${x}</li>`).join("");
   }
   function renderAcademic() {
     $("#academic").innerHTML = t("projects.academic.items").map((a, i) => `
@@ -231,7 +230,7 @@
   // ================================================================ orbit
   $$(".node").forEach((n) => n.addEventListener("click", () => {
     const id = n.dataset.target;
-    const card = id === "ai" ? $(".job") : id === "security" ? $("#security-prod") : $("#impact-" + id);
+    const card = id === "ai" ? $(".job") : id === "security" ? $("#thesis") : $("#impact-" + id);
     if (!card) return;
     card.scrollIntoView({ behavior: smooth(), block: "center" });
     card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
