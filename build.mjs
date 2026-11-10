@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
+import { createHash } from "node:crypto";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const SITE = "https://streeg.github.io";
@@ -75,6 +76,12 @@ function build(lang) {
   html = fillId(html, "email-link", R.esc(LINKS.email));
   html = fillId(html, "year", String(new Date().getFullYear()));
 
+  // cache busting: each script and the stylesheet get ?v=<content hash>, so a deploy never mixes old and new files
+  for (const f of ["styles.css", "content.js", "render.js", "pixel.js", "main.js", "fun.js"]) {
+    const v = createHash("sha256").update(readFileSync(join(ROOT, f))).digest("hex").slice(0, 10);
+    html = once(html, new RegExp(`"/${f.replace(".", "\\.")}"`), () => `"/${f}?v=${v}"`, f);
+  }
+
   // nothing left unfilled
   const empty = [...html.matchAll(/<([a-z0-9]+)\s[^>]*data-i18n="([^"]+)"[^>]*><\/\1>/g)].map((m) => m[2]);
   if (empty.length) throw new Error(`empty i18n nodes: ${empty.join(", ")}`);
@@ -94,5 +101,8 @@ writeFileSync(join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 ${["/", "/pt/"].map((p) => `  <url><loc>${SITE}${p}</loc><xhtml:link rel="alternate" hreflang="en" href="${SITE}/"/><xhtml:link rel="alternate" hreflang="pt-BR" href="${SITE}/pt/"/></url>`).join("\n")}
 </urlset>
 `);
-writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`);
+writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n
+# Looking for the flag? It is not here. A cat in the page source speaks base64.
+# Procurando a bandeira? Não está aqui. Um gato no código-fonte fala base64.
+`);
 console.log("built sitemap.xml, robots.txt");

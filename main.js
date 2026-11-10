@@ -41,6 +41,7 @@
     lang = lang === "pt" ? "en" : "pt";
     store.set("lang", lang);
     applyLang();
+    document.dispatchEvent(new CustomEvent("site:lang", { detail: lang }));
     try { history.replaceState(null, "", (lang === "pt" ? "/pt/" : "/") + location.search + location.hash); } catch (e) { /* file:// or sandboxed */ }
   });
 
@@ -51,6 +52,7 @@
     store.set("theme", next);
     game.redraw();
     if (reduced || !starsRunning) drawStarsOnce();
+    document.dispatchEvent(new CustomEvent("site:theme", { detail: next }));
   }
   const toggleTheme = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
   $("#toggle-theme").addEventListener("click", toggleTheme);
@@ -285,9 +287,8 @@
     const cv = $("#game-canvas"), g = cv.getContext("2d"), stage = $("#game-stage"), res = $("#game-result"), live = $("#game-live");
     const S = 320, CX = S / 2, CY = S / 2, HIT = 46;          // the ring "lands" when its radius reaches HIT
     const WIN = { perfect: 4, dodge: 9, grace: 17 };         // tolerance bands around HIT, in px
-    const IDLE_LIMIT = 3;                                    // unanswered attacks in a row before pausing
     let running = false, paused = false, ring = 0, speed = 0, wait = 0, judged = false, last = 0, raf = 0;
-    let streak = 0, idle = 0, lastKind = null, visibleRatio = 0;
+    let streak = 0, lastKind = null, visibleRatio = 0;
     let best = parseInt(store.get("riposte-best") || "0", 10) || 0;
     $("#best").textContent = best;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -309,29 +310,32 @@
       }
       if (!running) {
         g.fillStyle = css("--muted"); g.font = "600 15px Inter, system-ui, sans-serif"; g.textAlign = "center";
-        g.fillText(t(paused ? "projects.riposte.paused" : "projects.riposte.start"), CX, CY - 72);
+        g.fillText(t(paused ? "projects.riposte.over" : "projects.riposte.start"), CX, CY - 72);
       }
     }
     function nextAttack() { ring = 150; speed = 1.6 + Math.random() * 1.4 + Math.min(streak, 10) * 0.12; wait = 400 + Math.random() * 900; judged = false; }
-    function show(kind, byPlayer) {
+    function show(kind, announce) {
       lastKind = kind;
       res.textContent = t("projects.riposte.results." + kind);
       res.style.color = colors()[kind];
       res.classList.remove("show"); void res.offsetWidth; res.classList.add("show");
-      if (byPlayer) live.textContent = res.textContent;   // only announce what the player caused
+      if (announce) live.textContent = res.textContent;   // results and the game over; not every attack that starts
+      const reached = streak;
       streak = kind === "miss" ? 0 : streak + 1;
       if (streak > best) { best = streak; store.set("riposte-best", String(best)); }
       $("#streak").textContent = streak; $("#best").textContent = best;
+      document.dispatchEvent(new CustomEvent("site:game", { detail: { kind, streak: kind === "miss" ? reached : streak } }));
+      if (kind === "miss") stop(true);   // game over: the next click starts a new round
     }
-    function start() { running = true; paused = false; idle = 0; nextAttack(); last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
+    function start() { running = true; paused = false; nextAttack(); last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
     function stop(asPause) { running = false; paused = asPause; cancelAnimationFrame(raf); draw(); }
     function press() {
       if (!running) { start(); return; }
       if (judged || wait > 0) return;
       const d = Math.abs(ring - HIT);
-      judged = true; idle = 0;
+      judged = true;
       show(d <= WIN.perfect ? "perfect" : d <= WIN.dodge ? "dodge" : d <= WIN.grace ? "grace" : "miss", true);
-      setTimeout(() => running && nextAttack(), 450);
+      if (running) setTimeout(() => running && nextAttack(), 450);
     }
     function loop(now) {
       const dt = Math.min(48, now - last); last = now;
@@ -339,10 +343,9 @@
       else if (!judged) {
         ring -= speed * (dt / 16.7);
         if (ring < HIT - WIN.grace - 4) {
-          judged = true; idle++;
-          show("miss", false);
-          if (idle >= IDLE_LIMIT) { stop(true); return; }
-          setTimeout(() => running && nextAttack(), 450);
+          judged = true;
+          show("miss", true);
+          return;
         }
       }
       draw();
@@ -352,7 +355,7 @@
       visibleRatio = en.intersectionRatio;
       if (running && visibleRatio > 0) { last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
     }, { threshold: [0, 0.5, 1] }).observe(stage);
-    stage.addEventListener("pointerdown", (e) => { e.preventDefault(); press(); });
+    stage.addEventListener("pointerdown", (e) => { if (e.button > 0) return; e.preventDefault(); press(); });
     stage.addEventListener("keydown", (e) => {
       if (e.key !== " " && e.key !== "Enter") return;
       e.preventDefault(); e.stopPropagation();
@@ -380,7 +383,10 @@
   const go = (id) => () => document.getElementById(id).scrollIntoView({ behavior: smooth() });
   function commands() {
     const c = t("palette.cmds");
+    const raw = input.value.trim();
+    const flag = /^flag\{.+\}$/i.test(raw) ? [{ k: raw.toLowerCase(), label: `${c.flag}: ${raw}`, icon: "game", run: () => window.FUN && window.FUN.checkFlag(raw) }] : [];
     return [
+      ...flag,
       { k: "impact", label: c.impact, icon: "arrow", run: go("impact") },
       { k: "experience", label: c.experience, icon: "arrow", run: go("experience") },
       { k: "stack", label: c.stack, icon: "arrow", run: go("stack") },
@@ -388,6 +394,18 @@
       { k: "projects", label: c.projects, icon: "arrow", run: go("projects") },
       { k: "contact", label: c.contact, icon: "arrow", run: go("contact") },
       { k: "play", label: c.play, icon: "game", run: () => game.focus() },
+      { k: "special attack ataque energia", label: c.special, icon: "game", run: () => window.FUN && window.FUN.special() },
+      { k: "pets friends cats", label: c.friends, icon: "game", run: () => window.FUN && window.FUN.togglePets() },
+      { k: "treat fish petisco peixe", label: c.treat, icon: "game", run: () => window.FUN && window.FUN.treat() },
+      { k: "yarn rewind novelo enrolar linha", label: c.rewind, icon: "game", run: () => window.FUN && window.FUN.rewind() },
+      { k: "issue bug report vilao villain", label: c.issue, icon: "game", run: () => window.FUN && window.FUN.issue() },
+      { k: "pets cats gatos status fome", label: c.pets, icon: "game", run: () => window.FUN && window.FUN.showPets() },
+      { k: "litter caixa areia limpar clean", label: c.litter, icon: "game", run: () => window.FUN && window.FUN.litter() },
+      { k: "photo foto camera print", label: c.photo, icon: "game", run: () => window.FUN && window.FUN.photo() },
+      { k: "weather clima tempo neve chuva sol", label: c.weather.replace("{v}", window.FUN ? window.FUN.weatherName() : ""), icon: "sun", run: () => window.FUN && window.FUN.cycleWeather() },
+      { k: "season estacao natal inverno verao", label: c.season.replace("{v}", window.FUN ? window.FUN.seasonName() : ""), icon: "sun", run: () => window.FUN && window.FUN.cycleSeason() },
+      { k: "music dance musica danca", label: c.music, icon: "game", run: () => window.FUN && window.FUN.dance() },
+      { k: "achievements conquistas trophy", label: c.achievements + (window.FUN ? " (" + window.FUN.achvCount() + ")" : ""), icon: "game", run: () => window.FUN && window.FUN.showAchievements() },
       { k: "theme", label: c.theme, icon: "sun", run: toggleTheme },
       { k: "lang", label: c.lang, icon: "globe", run: () => $("#toggle-lang").click() },
       { k: "email", label: c.email, icon: "copy", run: copyEmail },
@@ -400,7 +418,7 @@
     items = commands().filter((c) => !q || c.label.toLowerCase().includes(q) || c.k.includes(q));
     sel = items.length ? Math.min(Math.max(sel, 0), items.length - 1) : 0;
     list.innerHTML = items.length
-      ? items.map((c, i) => `<li role="option" id="opt-${i}" aria-selected="${i === sel}" data-i="${i}">${svg(c.icon)}<span>${c.label}</span></li>`).join("")
+      ? items.map((c, i) => `<li role="option" id="opt-${i}" aria-selected="${i === sel}" data-i="${i}">${svg(c.icon)}<span>${R.esc(c.label)}</span></li>`).join("")
       : `<li class="empty" role="option" aria-disabled="true" aria-selected="false">${t("palette.empty")}</li>`;
     if (items.length) {
       input.setAttribute("aria-activedescendant", "opt-" + sel);
@@ -456,6 +474,16 @@
 
   // ================================================================ reduced-motion changes at runtime
   motionQuery.addEventListener("change", (e) => { reduced = e.matches; restartTyped(); syncStars(); if (reduced) $$(".reveal").forEach((el) => el.classList.add("in")); });
+
+  // ================================================================ hooks for fun.js (pixel friends, special move)
+  window.SITE = {
+    t, toast, $, $$, store,
+    lang: () => lang,
+    reduced: () => reduced,
+    paletteOpen: () => !pal.hidden,
+    pageRegions,
+    closeMenu: () => { if (!menu.hidden) setMenu(false); },
+  };
 
   // ================================================================ boot
   $("#year").textContent = new Date().getFullYear();

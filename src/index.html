@@ -17,7 +17,7 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Pixelify+Sans:wght@500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script>
     // Before paint: mark JS as available (entrance animations and collapsibles only apply then),
@@ -88,8 +88,6 @@
           </div>
           <ul class="chips reveal">
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6.1-6.5-11a6.5 6.5 0 0 1 13 0c0 4.9-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/></svg><span data-i18n="hero.location"></span></li>
-            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.2 2.9 8 7 9.5 4.1-1.5 7-5.3 7-9.5V6l-7-3Z"/><path d="m9.2 12 2 2 3.8-4"/></svg><span data-i18n="hero.security"></span></li>
-            <li data-i18n="hero.ai"></li>
           </ul>
         </div>
 
@@ -181,8 +179,8 @@
               <canvas id="game-canvas" width="320" height="320" aria-hidden="true"></canvas>
               <span class="game-result" id="game-result" aria-hidden="true"></span>
             </button>
+            <p class="sr-only" id="game-hint" data-i18n="projects.riposte.hint"></p>
             <span class="sr-only" id="game-live" aria-live="polite"></span>
-            <p class="game-hint" id="game-hint" data-i18n="projects.riposte.hint"></p>
             <p class="game-score"><span data-i18n="projects.riposte.streak"></span> <b id="streak">0</b> · <span data-i18n="projects.riposte.best"></span> <b id="best">0</b></p>
           </div>
         </article>
@@ -216,6 +214,7 @@
     </section>
   </main>
 
+  <!-- miau! c3ludHtwbmN2Z2hfcl9mbmFwdWJfbmNlYmluen0= -->
   <footer class="footer"><p class="hint-keys"><span data-i18n="footer"></span> <kbd>⌘K</kbd> <span data-i18n="footer2"></span></p><p>© <span id="year"></span> Guilherme Andreúce</p></footer>
 
   <div class="palette" id="palette" role="dialog" aria-modal="true" data-i18n-aria="a11y.palette" aria-label="" hidden>
@@ -228,6 +227,8 @@
 
   <script src="/content.js"></script>
   <script src="/render.js"></script>
+  <script src="/pixel.js"></script>
   <script src="/main.js"></script>
+  <script src="/fun.js"></script>
 </body>
 </html>
