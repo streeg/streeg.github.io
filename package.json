@@ -1,0 +1,18 @@
+{
+  "name": "streeg.github.io",
+  "private": true,
+  "type": "module",
+  "description": "My personal site: static HTML baked from content.js, plus the pixel friends.",
+  "scripts": {
+    "build": "node build.mjs",
+    "lint": "eslint",
+    "test": "node tests/run.mjs",
+    "check": "npm run build && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "eslint": "9.39.5",
+    "eslint-plugin-import": "2.31.0",
+    "globals": "15.14.0",
+    "playwright": "1.65.0"
+  }
+}

@@ -1,6 +1,6 @@
 // Photo mode: a PNG of the floor scene (the friends, the props, the thread and the snow), downloaded.
 import { S, t, SVGNS } from "./util.js";
-import { W, layer, showFriends } from "./world.js";
+import { W, emit, layer, showFriends } from "./world.js";
 import { ropePoints } from "./toys.js";
 import { sky } from "./seasons.js";
 import { unlock } from "./achv.js";
@@ -55,6 +55,7 @@ export async function photo() {
   fl.className = "px-shutter";
   document.body.append(fl);
   setTimeout(() => fl.remove(), 400);
+  emit("sfx", "shutter");
   unlock("photo");
   S.toast(t("photoSaved"));
 }

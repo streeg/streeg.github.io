@@ -6,7 +6,8 @@ import { W, api, emit, actors, cats, props, dropProp, layer, launch, start, stop
 import { me, setPower } from "./me.js";
 import { flash, burst, shake, cardOpen } from "./ui.js";
 import { bugSay, removeBug, regrow, hurtBoss } from "./villains.js";
-import { setLaser, ropeReset } from "./toys.js";
+import { ropeReset } from "./toys.js";
+import { setLaser } from "./laser.js";
 import { toSvg } from "./art/core.js";
 import { BLAST } from "./art/villains.js";
 import { unlock } from "./achv.js";
@@ -38,12 +39,15 @@ async function fightBug() {
   setPower(true);
   me.setFrame("charge");
   me.say(bubble(t("shout"), "fire"), 1500);
+  emit("sfx", "charge");
   await sleep(still ? 200 : 600);
   me.setFrame("release");
+  emit("sfx", "blast");
   if (!still) await shoot(dir, b.x + b.w / 2, b.y + b.h / 2);
   const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
   flash(cx, cy);
   burst(cx, cy, ["#7c3aed", "#a78bfa", "#e11d48", "#18181b"], 28);
+  emit("sfx", "hit");
   if (b.hp > 1) {   // the boss takes more than one hit
     hurtBoss(b);
     await sleep(350);
@@ -204,6 +208,7 @@ export async function special() {
   me.face = dir;
   me.setFrame("charge");
   me.say(bubble(t("shout"), "fire"), 1800);
+  emit("sfx", "charge");
   if (W.cat) {
     W.cat.locked = true; W.cat.queue = []; W.cat.task = null;
     W.cat.say(bubble(t("scared"), "skull"), 1500);
@@ -217,8 +222,10 @@ export async function special() {
   if (still) {
     root.classList.add("ko-down");
   } else {
+    emit("sfx", "blast");
     const hit = await shoot(dir);
     flash(hit.x, hit.y); shake();
+    emit("sfx", "crash");
     await sleep(120);
     W.ko.pieces = collectPieces().map(makePiece);
     // let the pieces fall out of clipped containers
@@ -271,6 +278,7 @@ async function rebuild() {
   const focusBack = $("#main");
   if (document.activeElement === document.body || !document.activeElement) { if (focusBack) focusBack.focus && focusBack.focus({ preventScroll: true }); }
   S.toast(t("rebuilt"));
+  emit("sfx", "rebuild");
   unlock("rebuild");
   setPower(true, 8000);
   if (W.ko.wasHidden) setTimeout(() => { if (!W.ko && store.get("pets") === "off") { layer.hidden = true; stop(); } }, 2500);

@@ -1,7 +1,7 @@
 // The dev: a small version of me. He wanders, says things, points at the interesting parts of the page,
 // codes (talking to Claude) when you go quiet, dozes, sleeps at night, and plays the scenes in scenes.js.
 import { $, t, now, rand, pick, clamp, unit, isNight, finePointer, bubble, keyCaps } from "./util.js";
-import { W, api, on, Actor, prop, wait, walk, act, launch, bind, mouse, input, addSystem } from "./world.js";
+import { W, api, on, emit, Actor, prop, wait, walk, act, launch, bind, mouse, input, addSystem } from "./world.js";
 import { FRAMES } from "./art/dev.js";
 import { PAL, PAL_POWER, toSvg } from "./art/core.js";
 import { MARKER } from "./art/icons.js";
@@ -14,18 +14,19 @@ me.heldFrame = "held";
 me.reply = document.createElement("div");
 me.reply.className = "px-reply";
 me.el.append(me.reply);
-me.onLand = (hit) => { if (hit > 1100) { me.say(bubble(t("ouch"), "star"), 1400); me.emoteFor("held", 300); } };
+me.onLand = (hit) => { if (hit > 1100) { me.say(bubble(t("ouch"), "star"), 1400); me.emoteFor("held", 300); emit("sfx", "thud"); } };
 me.onGrab = () => me.say(bubble(t("hey"), "skull"), 1200);
 me.onThrow = () => unlock("toss");
 
 const RESTING = ["code", "code2", "doze", "lie"];
 export const resting = (a) => RESTING.includes(a.base);
 
-let lineIdx = 0, lineHook = null;
-// another feature can slip in its own lines now and then (holidays do): fn() → [icon, text] or null
-export const setLineHook = (fn) => { lineHook = fn; };
+let lineIdx = 0;
+const lineHooks = [];
+// other features slip in their own lines now and then (holidays, achievement tips): fn() → [icon, text] or null
+export const addLineHook = (fn) => { lineHooks.push(fn); };
 export function nextLine() {
-  const extra = lineHook && Math.random() < 0.35 ? lineHook() : null;
+  const extra = lineHooks.length && Math.random() < 0.35 ? pick(lineHooks)() : null;
   if (extra) return bubble(extra[1], extra[0]);
   const lines = t("lines");
   const [icon, text, keys] = lines[lineIdx++ % lines.length];
@@ -253,4 +254,4 @@ function hoverMe() {
 }
 bind(me, tapMe, hoverMe);
 // he hops when something rolls at him
-export const hop = () => { launch(me, me.x, me.floor(), 0.42); me.setFrame("held"); };
+export const hop = () => { launch(me, me.x, me.floor(), 0.42); me.setFrame("held"); emit("sfx", "jump"); };

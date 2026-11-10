@@ -1,8 +1,8 @@
 // Boot: loads every feature, adds their commands to the palette, and lets the friends in.
 import { S, root, t, store, reduced } from "./util.js";
 import { W, actors, layer, wait, walk, act, start, togglePets, showFriends } from "./world.js";
-import { me, nextLine, playScene } from "./me.js";
-import { showAchievements, achvCount } from "./achv.js";
+import { me, nextLine, playScene, addLineHook } from "./me.js";
+import { showAchievements, achvCount, hintLine } from "./achv.js";
 import { showPets } from "./pets.js";
 import { dance } from "./scenes.js";
 import { spawnCat } from "./cats.js";
@@ -16,9 +16,13 @@ import { petState } from "./pets.js";
 import { ropePoints, ROPE } from "./toys.js";
 import { open as openTerminal } from "./terminal.js";
 import { shareCard } from "./share.js";
+import { toggleSound, soundOn } from "./sound.js";
 import "./together.js";
 import "./catreact.js";
 import "./reactions.js";
+
+// now and then the dev gives a tip for an achievement you have not found yet
+addLineHook(hintLine);
 
 // ---------------------------------------------------------------- palette commands
 const cleanLitter = () => { showFriends(); playScene("litter"); };
@@ -40,6 +44,7 @@ S.addCommands((raw) => {
     { k: "achievements conquistas trophy", label: `${c.achievements} (${achvCount()})`, icon: "game", run: showAchievements },
     { k: "share compartilhar conquistas achievements", label: c.share, icon: "game", run: shareCard },
     { k: "terminal console shell bash", label: c.terminal, icon: "game", run: openTerminal },
+    { k: "sound som audio 8-bit musica music", label: c.sound.replace("{v}", t(soundOn() ? "sound.on" : "sound.off")), icon: "game", run: () => toggleSound() },
   ];
 });
 

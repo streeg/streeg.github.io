@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Built pages are up to date
+        run: |
+          node build.mjs
+          git diff --exit-code -- index.html pt/index.html sitemap.xml robots.txt || (echo "::error::Run node build.mjs and commit the result" && exit 1)
+
+      - name: Lint
+        run: npx eslint
+
+      - name: Browser tests
+        run: |
+          npx playwright install --with-deps chromium
+          node tests/run.mjs

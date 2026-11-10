@@ -5,8 +5,8 @@
 // a jack-o'-lantern, a bonfire) and in the sky (snow that piles up, rain, leaves, petals, confetti, fireworks,
 // bats, a string of festa junina flags). At Easter three chocolate eggs hide on the page.
 import { S, $, root, t, store, now, rand, pick, unit, reduced, bubble } from "./util.js";
-import { W, layer, actors, prop, props, addSystem, on, showFriends } from "./world.js";
-import { me, setLineHook } from "./me.js";
+import { W, layer, actors, prop, props, addSystem, on, emit, showFriends } from "./world.js";
+import { me, addLineHook } from "./me.js";
 import { burst } from "./ui.js";
 import { HATS, CAT_HATS, PROPS } from "./art/props.js";
 import { toSvg } from "./art/core.js";
@@ -95,7 +95,7 @@ addSystem(() => actors.forEach((a) => { if (!wearsHats(a)) return; if (a.season 
 on("resize", () => actors.forEach((a) => { a.hatKey = ""; }));
 
 // a holiday line now and then, in between his usual ones
-setLineHook(() => { const lines = isHoliday() && t("holiday." + effSeason()); return lines ? pick(lines) : null; });
+addLineHook(() => { const lines = isHoliday() && t("holiday." + effSeason()); return lines ? pick(lines) : null; });
 
 // ---------------------------------------------------------------- the sky: a canvas behind everything
 export const sky = document.createElement("canvas");
@@ -122,6 +122,7 @@ function fireworks(g, dt) {
     r.y += r.vy * dt; r.vy += 260 * dt;
     g.fillStyle = r.c; g.fillRect(Math.round(r.x), Math.round(r.y), 2, 5);
     if (r.y > r.top && r.vy < -40) return true;
+    emit("sfx", "firework");
     for (let i = 0; i < 34; i++) { const a = rand(0, 6.28), v = rand(50, 190); sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, c: r.c }); }
     return false;
   });
@@ -238,6 +239,7 @@ function hideEggs() {
       const r = el.getBoundingClientRect();
       el.remove(); eggs = eggs.filter((x) => x !== e); eggsFound++;
       burst(r.left + r.width / 2, r.top, ["#facc15", "#e11d48", "#7c2d12"], 14);
+      emit("sfx", "collect");
       if (!me.locked) me.say(bubble(t(eggsFound >= 3 ? "holiday.eggsAll" : "holiday.eggFound").replace("{n}", eggsFound), "star"), 2200);
       if (eggsFound >= 3) unlock("eggs");
     });

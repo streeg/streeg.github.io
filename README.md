@@ -12,3 +12,23 @@ The content is baked into the HTML, so the page reads fine without JavaScript an
 - `build.mjs`: generates `index.html`, `pt/index.html`, `sitemap.xml` and `robots.txt` (`node build.mjs`, no dependencies)
 - `main.js`: behaviour (language switch, theme, palette, orbit, timeline, mini-game)
 - `styles.css`: design tokens and layout
+
+## Pixel friends
+
+A small pixel version of me and my cats, Capitu and Sancho, live along the bottom of the window. They are ES modules in `fun/`, loaded after `main.js`; the build versions each one through an import map.
+
+- `fun/world.js`: the engine (actors, props, tasks, physics, input, the main loop)
+- `fun/me.js`, `fun/scenes.js`, `fun/cats.js`, `fun/together.js`: the dev, his scenes, the cats, and the three of them together
+- `fun/toys.js`, `fun/pets.js`, `fun/villains.js`, `fun/special.js`, `fun/seasons.js`, `fun/terminal.js`, `fun/sound.js` and friends: one feature each
+- `fun/art/`: the pixel art, as character grids
+- `fun/i18n.js`: their copy, in both languages
+
+## Checks
+
+`npm ci` once, then:
+
+- `npm run lint`: static checks on `fun/` (undefined names, missing imports, import cycles)
+- `npm test`: browser test suites (`tests/page/`), run with Playwright against the site served locally
+- `npm run check`: build, lint and test
+
+GitHub Actions runs the same on every push and pull request, and also checks that the built pages are up to date.

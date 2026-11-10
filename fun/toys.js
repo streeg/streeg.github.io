@@ -1,7 +1,7 @@
 // Toys: the ball of yarn (tap to kick, drag to throw, hold and spin to wind it up) whose thread is a rope
-// with physics, the red laser dot (hold Shift) and fish treats (double-click the floor).
-import { S, root, t, now, rand, clamp, SVGNS, finePointer, reduced, typing, bubble } from "./util.js";
-import { W, layer, actors, cats, isCat, Actor, wait, walk, until, act, launch, grab, mouse, addActorHook, addSystem, showFriends } from "./world.js";
+// with physics, and fish treats (double-click the floor).
+import { t, now, rand, clamp, SVGNS, reduced, bubble } from "./util.js";
+import { W, emit, layer, actors, cats, isCat, Actor, wait, walk, until, act, launch, grab, addActorHook, addSystem, showFriends } from "./world.js";
 import { me, hop } from "./me.js";
 import { petFeed } from "./pets.js";
 import { PROPS } from "./art/props.js";
@@ -23,45 +23,16 @@ export const chaseYarn = () => ({
     if (yarn.mode === "ground") {
       petFeed(a, "fun", 15);
       if (rope.length > 12 && Math.random() < 0.3) { tangle(a); return true; }
+      emit("sfx", "kick");
       a.setFrame("paw"); yarn.mode = "air"; yarn.vx = a.face * rand(180, 380); yarn.vy = -rand(220, 420);
     }
     return true;
   },
 });
-function kickYarn(y) {
+export function kickYarn(y) {
   unlock("yarn");
+  emit("sfx", "kick");
   y.mode = "air"; y.vx = (Math.random() < 0.5 ? -1 : 1) * rand(240, 460); y.vy = -rand(320, 520);
-}
-
-const dot = document.createElement("div");
-dot.className = "px-laser";
-dot.hidden = true;
-layer.append(dot);
-export function setLaser(on) {
-  if (W.laser === on) return;
-  W.laser = on; dot.hidden = !on;
-  root.classList.toggle("px-laser-on", on);
-  if (on) unlock("laser");
-}
-window.addEventListener("keydown", (e) => {
-  if (e.key !== "Shift" || e.repeat || W.ko || layer.hidden || reduced() || !finePointer.matches || S.paletteOpen()) return;
-  if (typing() || now() - mouse.t > 5000) return;
-  setLaser(true);
-});
-window.addEventListener("keyup", (e) => { if (e.key === "Shift") setLaser(false); });
-window.addEventListener("blur", () => setLaser(false));
-function chaseLaser(c, dt) {
-  c.queue = []; c.task = null; c.soft = false;
-  petFeed(c, "fun", dt * 4);
-  if (c.mode !== "ground") return;
-  const d = mouse.x - c.cx();
-  c.face = d > 0 ? 1 : -1;
-  if (Math.abs(d) > 8) { c.x += Math.sign(d) * Math.min(Math.abs(d), 320 * dt); c.setFrame(c.gait[Math.floor(now() / 80) % c.gait.length]); }
-  else c.setFrame(mouse.y > innerHeight - 120 ? "paw" : "sit");
-  if (mouse.y > innerHeight - 150 && Math.abs(d) < 70 && Math.abs(d) > 10 && now() > (c.pounceCool || 0)) {
-    c.pounceCool = now() + 1100;
-    launch(c, clamp(mouse.x - c.w / 2, 4, c.maxX()), c.floor(), 0.34);
-  }
 }
 
 // ================================================================ treats: double-click the floor (or use the palette) to drop a fish
@@ -72,6 +43,7 @@ function dropTreat(x, y) {
   fish.el.style.pointerEvents = "none";
   fish.x = clamp(x - fish.w / 2, 4, fish.maxX()); fish.y = y; fish.mode = "air"; fish.vy = -120;
   unlock("treat");
+  emit("sfx", "drop");
   setTimeout(() => { if (actors.includes(fish)) fish.remove(); }, 15000);
   const c = cats().filter((k) => k.mode !== "held").sort((p, q) => Math.abs(p.cx() - fish.cx()) - Math.abs(q.cx() - fish.cx()))[0];
   if (!c) return;
@@ -80,7 +52,7 @@ function dropTreat(x, y) {
     walk(() => (c.cx() < fish.cx() ? fish.x - c.w + 8 : fish.x + fish.w - 8), 220),
     act(() => { c.face = fish.cx() > c.cx() ? 1 : -1; }),
     wait(250, "sit"), wait(320, "paw"), wait(250, "sit"),
-    act(() => { if (actors.includes(fish)) fish.remove(); petFeed(c, "food", 40); c.pop("heart"); c.say(bubble(t("nom"), "heart"), 1500); }),
+    act(() => { if (actors.includes(fish)) fish.remove(); emit("sfx", "nom"); petFeed(c, "food", 40); c.pop("heart"); c.say(bubble(t("nom"), "heart"), 1500); }),
     wait(1600, "sit"),
   ]);
 }
@@ -106,13 +78,14 @@ layer.insertBefore(thread, layer.firstChild);
 // The simulation runs in fixed small steps (smooth whatever the frame rate): verlet points, then distance
 // constraints solved in alternating sweeps (so a long thread does not stretch like a rubber band), with the
 // collisions solved inside the same loop (so it rests on edges instead of jittering through them).
-const SEG = 9, MAX_NODES = 240, STEP = 1 / 120, GRAVITY = 1500;
-export const ROPE = { iter: 14, lra: true, drag: 0.995, floorFriction: 0.3, snag: 0.6, collideEvery: 3, sleep: 0.35 };   // tuning (QA can change it)
+const SEG = 9, MAX_NODES = 320, STEP = 1 / 120, GRAVITY = 1500;
+export const ROPE = { iter: 14, lra: true, drag: 0.995, floorFriction: 0.3, snag: 0.6, collideEvery: 3, sleep: 0.35, feed: true, grip: 0.12 };   // tuning (QA can change it)
 const SNAG = ".btn, .tech, .impact-card, .job, .chips li, .project, .contact-card, .filter, .section-head h2";
 let rope = [], anchorX = null, rewinding = false, winding = false, colliders = [], collidersAt = 0, simTime = 0;
 let lastBall = null;   // where the ball was on the previous step (new thread comes out of it with its speed)
 let restFor = 0;       // how long the ball has been still: then the thread settles and stops creeping
 // scrolling moves the cards under the thread: it wakes up and falls or gets carried along
+// scrolling moves the cards under the thread: it wakes up, and falls where its support went away (like a perched cat)
 window.addEventListener("scroll", () => { collidersAt = 0; restFor = 0; }, { passive: true });
 window.addEventListener("resize", () => { collidersAt = 0; restFor = 0; });
 function refreshColliders() {
@@ -122,18 +95,16 @@ function refreshColliders() {
 }
 const ropeFloor = () => innerHeight - 3;
 export function ropeReset() { rope = []; anchorX = null; lastBall = null; }
-// push a point out of the floor and out of any card or button it went into; resting on a top edge snags it
+// The floor, and the top edges of cards and buttons as one-way platforms (like in old platform games): thread
+// falling onto a card rests on it and snags, but it is never shoved sideways or from below. The thread hangs in
+// front of the page, so the content scrolling behind it must not yank it around.
 function collide(q, near) {
   const floor = ropeFloor();
   // friction moves the point back toward where it was, so resting thread holds instead of sliding forever
   if (q.y > floor) { q.y = floor; q.x -= (q.x - q.px) * ROPE.floorFriction; }
   for (const r of near) {
-    if (q.x <= r.left || q.x >= r.right || q.y <= r.top || q.y >= r.bottom) continue;
-    const up = q.y - r.top, down = r.bottom - q.y, left = q.x - r.left, right = r.right - q.x, m = Math.min(up, down, left, right);
-    if (m === up) { q.y = r.top; q.x -= (q.x - q.px) * ROPE.snag; }   // resting on a top edge: it snags
-    else if (m === down) q.y = r.bottom;
-    else if (m === left) q.x = r.left;
-    else q.x = r.right;
+    if (q.x <= r.left || q.x >= r.right || q.y <= r.top || q.py > r.top + 1 || q.y > r.top + SEG) continue;
+    q.y = r.top; q.x -= (q.x - q.px) * ROPE.snag;
   }
 }
 // keep segment i (point i to the next one, or to the ball) from being longer than SEG; the end on the floor,
@@ -143,11 +114,12 @@ function solve(i, bx, by) {
   const tx = last ? bx : b.x, ty = last ? by : b.y;
   const dx = tx - a.x, dy = ty - a.y, dist = Math.hypot(dx, dy);
   if (dist <= SEG || dist === 0) return;
-  const wa = i === 0 || a.pin ? 0 : 1, wb = last || b.pin ? 0 : 1;
+  // thread lying on top of a card grips it: it gives way much less than thread hanging in the air
+  const wa = i === 0 || a.pin ? 0 : a.grip ? ROPE.grip : 1, wb = last || b.pin ? 0 : b.grip ? ROPE.grip : 1;
   if (!wa && !wb) return;
   const diff = (dist - SEG) / dist / (wa + wb);
-  if (wa) { a.x += dx * diff; a.y += dy * diff; }
-  if (wb) { b.x -= dx * diff; b.y -= dy * diff; }
+  if (wa) { a.x += dx * diff * wa; a.y += dy * diff * wa; }   // each end moves by its share
+  if (wb) { b.x -= dx * diff * wb; b.y -= dy * diff * wb; }
 }
 // a point lying on the floor or on the top edge of a card or button
 const supported = (q, near) => q.y >= ropeFloor() - 0.6 || near.some((r) => q.x > r.left && q.x < r.right && Math.abs(q.y - r.top) < 0.6);
@@ -166,6 +138,16 @@ function stepRope(bx, by, bvx, bvy, settled) {
       rope.push({ x, y, px: x - bvx * STEP, py: y - bvy * STEP });
     }
   }
+  // pulled taut at the floor end (the page carried it up, or the ball dragged it): more thread comes off the pile
+  // on the floor instead of the thread being yanked through the cards
+  const a0 = rope[0];
+  if (ROPE.feed && rope.length > 1 && !rewinding && !winding) {
+    const q = rope[1], d = Math.hypot(q.x - a0.x, q.y - a0.y), add = Math.min(MAX_NODES - rope.length, Math.ceil(d / SEG) - 1);
+    for (let k = add; k >= 1; k--) {
+      const f = k / (add + 1), x = a0.x + (q.x - a0.x) * f, y = a0.y + (q.y - a0.y) * f;
+      rope.splice(1, 0, { x, y, px: x, py: y });
+    }
+  }
   // verlet: gravity and a little air drag
   const g = GRAVITY * STEP * STEP;
   // only the cards and buttons around the thread take part in the collisions
@@ -178,6 +160,7 @@ function stepRope(bx, by, bvx, bvy, settled) {
     if (!settled) q.pin = false;
     else if (!q.pin && Math.abs(vx) + Math.abs(vy) < ROPE.sleep && supported(q, near)) q.pin = true;
     q.px = q.x; q.py = q.y;
+    q.grip = q.y < ropeFloor() - 1 && near.some((r) => q.x > r.left && q.x < r.right && Math.abs(q.y - r.top) < 1);
     if (q.pin) continue;
     q.x += vx; q.y += vy + g;
   }
@@ -220,6 +203,8 @@ function tickRope(dt) {
     stepRope(from.x + (bx - from.x) * k, from.y + (by - from.y) * k, bvx, bvy, restFor > 0.8);
   }
   simTime -= steps * STEP;
+  // safety net: should the simulation ever blow up, start the thread over instead of drawing garbage
+  if (rope.some((q) => !Number.isFinite(q.x) || !Number.isFinite(q.y))) { ropeReset(); threadPath.setAttribute("d", ""); return; }
   lastBall = { x: bx, y: by };
   // all the thread is out: the rope holds the ball back (it loses the speed that pulls it away)
   if (rope.length >= MAX_NODES && yarn.mode !== "held") {
@@ -270,6 +255,7 @@ function windIn(n) {
   }
   if (rope.length > 2) return false;
   ropeReset();
+  emit("sfx", "wound");
   yarn.pop("heart");
   yarn.say(bubble(t("wound"), "star"), 1400);
   return true;
@@ -362,6 +348,7 @@ function tangle(c) {
   c.tangledUntil = now() + rand(2800, 3800);
   c.el.classList.add("px-tangled");
   c.say(bubble(t("tangled"), "skull"), 1500);
+  emit("sfx", "yowl");
   yarn.mode = "held"; yarn.vx = yarn.vy = 0;
   unlock("tangle");
   petFeed(c, "fun", 10);
@@ -379,13 +366,13 @@ W.yarn = yarn;
 yarn.rolls = true; yarn.bouncy = true; yarn.spinStep = 90;   // pixel art turns in quarter turns, so it stays crisp
 yarn.x = Math.round(innerWidth * 0.8);
 yarn.onThrow = () => unlock("yarn");
+yarn.onBounce = (hit) => { if (hit > 420) emit("sfx", "bounce"); };
 bindYarn();
 export const ropePoints = () => rope;
 
 // ---------------------------------------------------------------- every frame
-// cats drop everything for the laser dot, and run after the yarn when it rolls or flies
+// cats run after the yarn when it rolls or flies (the laser dot, in laser.js, comes first)
 addActorHook((a, dt) => {
-  if (W.laser && isCat(a) && !a.tangledUntil && !W.ko && !reduced()) { chaseLaser(a, dt); return "skip"; }
   if (isCat(a) && !W.ko && !reduced() && a.mode === "ground" && a.soft && a.base !== "sleep" && now() > (a.yarnCool || 0)
     && (Math.abs(yarn.vx) > 80 || yarn.mode === "air")) {
     a.yarnCool = now() + 2500;
@@ -409,5 +396,4 @@ addSystem((dt) => {
     }
   }
   actors.forEach((a) => { if (a.tangledUntil && now() > a.tangledUntil) untangle(a); });
-  if (W.laser) dot.style.transform = `translate(${mouse.x - 5}px, ${mouse.y - 5}px)`;
 }, 20);

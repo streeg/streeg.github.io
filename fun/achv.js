@@ -1,13 +1,27 @@
 // Achievements: a toast when one unlocks, a trophy button in the nav with the count, and the list.
-import { $, t, store, emo } from "./util.js";
+// Each one has a pixel badge, a name and a hint; secret ones keep their name hidden until found.
+import { $, t, store, pick } from "./util.js";
 import { emit } from "./world.js";
 import { openCard } from "./ui.js";
+import { toSvg } from "./art/core.js";
+import { BADGES } from "./art/badges.js";
 
-// The order here is the order of the list.
-export const ACHV = ["pet", "toss", "coin", "perfect", "treat", "yarn", "tangle", "laser", "cats", "lap", "spill", "litter", "wake", "dance", "flow", "photo", "eggs",
-  "bottom", "terminal", "sudo", "special", "rebuild", "bug", "conflict", "friday", "legacy", "flag"];
+// Grouped for the list; the order here is the order on screen.
+const GROUPS = {
+  cats: { pet: "heart", cats: "cat", treat: "fish", lap: "lap", tangle: "knot", spill: "coffee", litter: "litter" },
+  dev: { toss: "dev", wake: "sun", dance: "note", flow: "fire", photo: "camera" },
+  toys: { yarn: "yarn", laser: "laser", coin: "coin" },
+  site: { perfect: "target", bottom: "down", terminal: "term", eggs: "choc" },
+  power: { special: "blast", rebuild: "wrench", bug: "bug", conflict: "merge", friday: "skull" },
+  secrets: { legacy: "crt", sudo: "lock", flag: "flag" },
+};
+const SECRET = new Set(Object.keys(GROUPS.secrets));
+const BADGE = Object.assign({}, ...Object.values(GROUPS));
+export const ACHV = Object.keys(BADGE);
 export let got = new Set();
 try { got = new Set((JSON.parse(store.get("px-achv") || "[]") || []).filter((k) => ACHV.includes(k))); } catch (e) { /* corrupted: start over */ }
+
+const badge = (k) => `<span class="px-emo px-badge">${toSvg(BADGES[BADGE[k]])}</span>`;
 
 const toastEl = document.createElement("div");
 toastEl.className = "px-achv";
@@ -35,18 +49,34 @@ export function unlock(k) {
   got.add(k);
   store.set("px-achv", JSON.stringify([...got]));
   updateButton();
-  toastEl.innerHTML = `${emo("trophy")}<span><small>${t("achv.unlocked")} · ${got.size}/${ACHV.length}</small><b>${t("achv.items." + k)}</b></span>`;
+  toastEl.innerHTML = `${badge(k)}<span><small>${t("achv.unlocked")} · ${got.size}/${ACHV.length}</small><b>${t("achv.items." + k)}</b></span>`;
   toastEl.classList.remove("show"); void toastEl.offsetWidth; toastEl.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3800);
   emit("unlock", k);
 }
+
+// A hint for one you have not found yet (the dev drops these now and then): never a secret one.
+export function hintLine() {
+  const open = ACHV.filter((k) => !got.has(k) && !SECRET.has(k));
+  if (!open.length) return null;
+  return ["star", `${t("achv.tip")} ${t("achv.hints." + pick(open))}`];
+}
+
 // Extra buttons on the list (the share card adds one).
 export const listButtons = [];
 export function showAchievements() {
-  const items = ACHV.map((k) => (got.has(k)
-    ? `<li class="got">${emo("trophy")}<span>${t("achv.items." + k)}</span></li>`
-    : `<li><span class="px-emo px-lock"></span><span>${t("achv.locked")}</span></li>`)).join("");
-  return openCard("px-achv-list", t("achv.title"), achvCount(), `<ul>${items}</ul>`, t("achv.close"), listButtons.map((b) => b()));
+  const row = (k) => {
+    const has = got.has(k), hidden = SECRET.has(k) && !has;
+    const name = hidden ? t("achv.locked") : t("achv.items." + k);
+    const hint = t((hidden ? "achv.secretHints." : "achv.hints.") + k);
+    return `<li class="${has ? "got" : ""}">${badge(k)}<span><b>${name}</b><small>${hint}</small></span>${has ? `<i class="px-check" aria-label="${t("achv.done")}">✓</i>` : ""}</li>`;
+  };
+  const html = Object.entries(GROUPS).map(([g, items]) => {
+    const keys = Object.keys(items), n = keys.filter((k) => got.has(k)).length;
+    return `<li class="px-achv-group"><h3>${t("achv.groups." + g)}</h3><span>${n}/${keys.length}</span></li>${keys.map(row).join("")}`;
+  }).join("");
+  const pct = Math.round((100 * got.size) / ACHV.length);
+  const bar = `<div class="px-achv-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${ACHV.length}" aria-valuenow="${got.size}"><i style="width:${pct}%"></i></div>`;
+  return openCard("px-achv-list", t("achv.title"), achvCount(), `${bar}<ul>${html}</ul>`, t("achv.close"), listButtons.map((b) => b()));
 }
-

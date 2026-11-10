@@ -2,7 +2,7 @@
 // things off the stack, the yarn, napping by the dev, sitting on his head), the theme switch (the new cat drops
 // out of the button and the old one leaves) and the other cat's visits.
 import { $, root, t, now, rand, pick, clamp, unit, isNight, finePointer, reduced, bubble } from "./util.js";
-import { W, actors, catNamed, Actor, layer, wait, walk, act, until, landed, launch, jumpTo, hopDown, bind, mouse, addActorHook, addSystem } from "./world.js";
+import { W, emit, actors, catNamed, Actor, layer, wait, walk, act, until, landed, launch, jumpTo, hopDown, bind, mouse, addActorHook, addSystem } from "./world.js";
 import { me, headPerch, resting } from "./me.js";
 import { CATS, petState, petOf, petFeed, petStatus } from "./pets.js";
 import { chaseYarn } from "./toys.js";
@@ -46,7 +46,7 @@ function findKnock(a) {
   }
   return null;
 }
-function knockOff(tile, dir) {
+export function knockOff(tile, dir) {
   if (!tile.animate || tile.dataset.knocked) return;
   tile.dataset.knocked = "1";
   const r = tile.getBoundingClientRect();
@@ -139,6 +139,7 @@ function catBrain(a) {
 }
 
 function tapCat(a) {
+  emit("sfx", "meow");
   unlock("pet");
   petFeed(a, "fun", 12);
   if (a.base === "sleep") a.interrupt([wait(1500, "sit")]);

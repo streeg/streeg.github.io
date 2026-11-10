@@ -80,6 +80,7 @@ export class Actor {
     el.innerHTML = emo(icon);
     this.el.append(el);
     setTimeout(() => el.remove(), 1100);
+    emit("pop", this, icon);
   }
   interrupt(tasks, soft = false) { this.queue = tasks; this.task = null; this.soft = soft; }
   remove() { this.el.remove(); if (actors.includes(this)) actors.splice(actors.indexOf(this), 1); if (this === W.visitor) W.visitor = null; emit("removed", this); }
@@ -207,7 +208,7 @@ export function step(a, dt, still) {
     if (a.y >= a.floor()) {
       const hit = a.vy;
       a.y = a.floor();
-      if (a.bouncy && hit > 260) { a.vy = -hit * 0.42; a.vx *= 0.8; return; }
+      if (a.bouncy && hit > 260) { a.vy = -hit * 0.42; a.vx *= 0.8; if (a.onBounce) a.onBounce(hit); return; }
       a.vy = 0; if (!a.rolls) a.vx = 0;
       a.mode = "ground"; a.land = null; a.setFrame(a.rest);
       if (a.onLand) a.onLand(hit);

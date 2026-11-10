@@ -492,10 +492,23 @@ html.px-laser-on, html.px-laser-on * { cursor: none !important; }
 .px-achv-list { text-align: left; }
 .px-achv-list h2 { text-align: center; }
 .px-achv-list .ko-body { text-align: center; margin-bottom: 14px; }
-.px-achv-list ul { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 6px; max-height: 50vh; overflow: auto; font: 500 14px "Pixelify Sans", var(--mono); }
-.px-achv-list li { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; background: var(--surface); color: var(--faint); }
-.px-achv-list li.got { color: var(--text); }
-.px-lock { display: block; width: 16px; height: 16px; background: var(--line-2); }
+.px-achv-list.ko-card { width: min(520px, calc(100% - 32px)); }
+.px-achv-list ul { list-style: none; margin: 0 0 20px; padding: 0 4px 0 0; display: grid; gap: 6px; max-height: 52vh; overflow: auto; font: 500 14px "Pixelify Sans", var(--mono); }
+.px-achv-list li { display: flex; align-items: center; gap: 12px; padding: 7px 10px; border-radius: 10px; background: var(--surface); color: var(--muted); }
+.px-achv-list li > span:not(.px-emo) { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.px-achv-list li b { font-weight: 500; color: var(--text); }
+.px-achv-list li small { font: 400 12.5px/1.35 Inter, system-ui, sans-serif; color: var(--faint); }
+.px-achv-list li.got small { color: var(--muted); }
+.px-achv-list .px-badge svg { width: 24px; height: 24px; }
+.px-achv-list li:not(.got) .px-badge { filter: grayscale(1) brightness(.7); opacity: .45; }   /* not found yet */
+.px-achv-list li:not(.got) b { color: var(--muted); }
+.px-check { font-style: normal; color: #4ade80; font-size: 15px; }
+.px-achv-list li.px-achv-group { background: none; padding: 10px 2px 0; justify-content: space-between; }
+.px-achv-list li.px-achv-group:first-child { padding-top: 0; }
+.px-achv-group h3 { margin: 0; font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.px-achv-group span { font: 500 12px var(--mono); color: var(--faint); }
+.px-achv-progress { height: 8px; margin: -6px 0 16px; border-radius: 99px; background: var(--surface); overflow: hidden; }
+.px-achv-progress i { display: block; height: 100%; background: var(--grad); }
 .px-achv-list .btn { display: flex; margin: 0 auto; }
 @media print { .px-achv { display: none; } }
 /* flow state: white hair (palette swap in fun.js) plus a flickering aura */

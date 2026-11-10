@@ -1,7 +1,8 @@
 // A tiny pretend terminal (palette: "Terminal", or the ` key): ls, cat, whoami, neofetch, git, sudo…
 // Some commands drive the friends (sudo make coffee, git blame, git push --force). Output is plain text only.
 import { S, $, root, t, now, rand, typing, bubble } from "./util.js";
-import { W, wait, walk, act, jumpTo, hopDown, landed, showFriends, layer } from "./world.js";
+import { W, emit, wait, walk, act, jumpTo, hopDown, landed, showFriends, layer } from "./world.js";
+import { toggleSound, soundName } from "./sound.js";
 import { playScene } from "./me.js";
 import { petState, CATS } from "./pets.js";
 import { summonBug } from "./villains.js";
@@ -120,6 +121,7 @@ const COMMANDS = {
   sudo,
   rm: () => [t("term.permission")],
   ping: () => ["pong"],
+  sound: (a) => { toggleSound(a[0] === "on" ? true : a[0] === "off" ? false : undefined); return [soundName()]; },
   theme: () => { $("#toggle-theme").click(); return [t("term." + (root.getAttribute("data-theme") === "light" ? "light" : "dark"))]; },
   lang: () => { leave(() => $("#toggle-lang").click()); return []; },
   pets: () => Object.values(CATS).flatMap(catFile),
@@ -136,7 +138,7 @@ const COMMANDS = {
   clear: () => { out.textContent = ""; return []; },
   exit: () => { close(); return []; },
 };
-const ALIAS = { ajuda: "help", gatos: "pets", petisco: "treat", cafe: "coffee", "café": "coffee", foto: "photo", clima: "weather", estacao: "season", "estação": "season",
+const ALIAS = { som: "sound", ajuda: "help", gatos: "pets", petisco: "treat", cafe: "coffee", "café": "coffee", foto: "photo", clima: "weather", estacao: "season", "estação": "season",
   conquistas: "achievements", jogar: "play", sair: "exit", quit: "exit", tema: "theme", idioma: "lang", cls: "clear", dir: "ls" };
 
 function run(raw) {
@@ -148,7 +150,7 @@ function run(raw) {
   const [name, ...args] = line.split(/\s+/);
   const key = ALIAS[name.toLowerCase()] || name.toLowerCase();
   const fn = Object.prototype.hasOwnProperty.call(COMMANDS, key) ? COMMANDS[key] : null;
-  if (!fn) { print(t("term.notFound").replace("{c}", name), "px-term-err"); return; }
+  if (!fn) { print(t("term.notFound").replace("{c}", name), "px-term-err"); emit("sfx", "beep"); return; }
   const res = fn(args);
   if (Array.isArray(res)) lines(res);
 }

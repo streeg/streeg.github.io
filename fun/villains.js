@@ -3,7 +3,7 @@
 // Ways to call one: type bug / merge / sexta / friday, open an issue from the palette, click the tiny bug that crawls
 // on the cards, or just be here on a Friday afternoon. The special attack (special.js) defeats them.
 import { t, now, rand, pick, clamp, unit, finePointer, reduced, typing, bubble, keyCaps, S } from "./util.js";
-import { W, layer, cats, launch, sayIn, on, addSystem, showFriends } from "./world.js";
+import { W, layer, cats, launch, sayIn, on, emit, addSystem, showFriends } from "./world.js";
 import { me, resting, addPoi } from "./me.js";
 import { flash, burst, shake, cardOpen } from "./ui.js";
 import { toSvg } from "./art/core.js";
@@ -45,6 +45,7 @@ export function summonBug(kind = "bug", from, force) {
   el.addEventListener("pointerdown", (e) => { e.preventDefault(); if (W.bug && !W.bug.leaving) bugSay(bubble(t("bug.poke"), "skull"), 2000); });
   if (from) { flash(from.x, from.y); burst(from.x, from.y, ["#7c3aed", "#a78bfa", "#e11d48"], 16); }
   if (v.boss && !reduced()) shake();
+  emit("sfx", v.boss ? "boss" : "villain");
   setTimeout(() => { if (W.bug && !W.bug.leaving) bugSay(bubble(t(v.arrive), "skull"), 2800); }, 900);
   if (!me.locked) {
     me.face = W.bug.tx + w / 2 > me.cx() ? 1 : -1;
