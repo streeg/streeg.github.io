@@ -21,6 +21,8 @@ A small pixel version of me and my cats, Capitu and Sancho, live along the botto
 - `fun/me.js`, `fun/scenes.js`, `fun/cats.js`, `fun/together.js`: the dev, his scenes, the cats, and the three of them together
 - `fun/toys.js`, `fun/pets.js`, `fun/villains.js`, `fun/special.js`, `fun/seasons.js`, `fun/terminal.js`, `fun/sound.js` and friends: one feature each
 - `fun/home.js`, `fun/clock.js`, `fun/routine.js`, `fun/daynight.js`, `fun/critters.js`, `fun/visits.js`, `fun/lud.js`, `fun/aquarium.js`: the home corner, the day by the visitor's clock, the sky, the critters, the visits and the screensaver-like aquarium mode
+- `fun/forecast.js`, `fun/outside.js`: the real weather in Brasília (Open-Meteo, no key) and how the little world reacts to it (puddles, the umbrella, a fan on hot days)
+- `fun/dreams.js`, `fun/github.js`, `fun/reading.js`, `fun/fishing.js`: dream bubbles, the reaction to public GitHub pushes, the dev reading along with the visitor, and fishing in aquarium mode
 - `fun/art/`: the pixel art, as character grids
 - `fun/i18n.js`: their copy, in both languages
 
@@ -29,7 +31,7 @@ A small pixel version of me and my cats, Capitu and Sancho, live along the botto
 `npm ci` once, then:
 
 - `npm run lint`: static checks on `fun/` (undefined names, missing imports, import cycles)
-- `npm test`: browser test suites (`tests/page/`), run with Playwright against the site served locally
+- `npm test`: browser test suites (`tests/page/`), run with Playwright against the site served locally (the weather and GitHub APIs are answered by the runner, so the checks never touch the network)
 - `npm run check`: build, lint and test
 
 GitHub Actions runs the same on every push and pull request, and also checks that the built pages are up to date.

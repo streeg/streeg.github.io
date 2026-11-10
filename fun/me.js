@@ -214,7 +214,7 @@ me.brain = (a) => {
   if (quiet > 45000) { a.queue.push(wait(rand(9000, 14000), "doze", snore)); return; }
   if (quiet > 20000) { a.queue.push(wait(rand(9000, 14000), "code", working, startCoding)); return; }
   const r = Math.random();
-  const poi = urgentPoi() || (now() > pointCool && r < 0.3 ? findPoi() : null);
+  const poi = W.aquarium ? null : urgentPoi() || (now() > pointCool && r < 0.3 ? findPoi() : null);   // in aquarium mode the page is hidden
   if (poi) { pointAt(poi); return; }
   const urgent = SCENES.find((s) => s.urgent && s.urgent());
   if (urgent) { a.soft = false; urgent.run(); return; }

@@ -1,6 +1,7 @@
 // An 8×8 badge for each achievement (the list and the toast). Some reuse the bubble emoji or the props.
 import { EMOJI } from "./icons.js";
 import { PROPS } from "./props.js";
+import { LIFE_BADGES } from "./life.js";
 
 const NEW = {
   coin: ["..oooo..", ".oYYYYo.", "oYWYYYYo", "oYWYYYYo", "oYYYYYYo", "oYYYYYYo", ".oYYYYo.", "..oooo.."],
@@ -31,4 +32,4 @@ const NEW = {
   bowlfish: ["..cccc..", ".c....c.", "cQQQQQQc", "cQYYQQQc", "cQYYYQQc", "cQQQQQQc", ".cQQQQc.", "..cccc.."],
   lud: ["........", ".dd..dd.", "dWdddddd", "dddddddd", "dddddddd", ".dddddd.", "..dddd..", "...dd..."],
 };
-export const BADGES = Object.assign({}, EMOJI, NEW, { yarn: PROPS.yarn });
+export const BADGES = Object.assign({}, EMOJI, NEW, LIFE_BADGES, { yarn: PROPS.yarn });

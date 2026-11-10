@@ -188,6 +188,9 @@ const RAW = {
   eat2: sitHold(9, 19, BOWL),
   read1: sitHold(9, 27, BOOK1),
   sip: stamp(wave, 23, 9, [".c.c.", "c.c..", "vvvv.", "vdvvv", "vvvv."]),
+  // a popsicle on a hot day (two frames: a lick)
+  pop1: stamp(wave, 25, 4, [".n.", "nnn", "nln", "nnn", "nln", ".c.", ".c."]),
+  pop2: stamp(wave, 25, 5, [".n.", "nnn", "nln", "nnn", "nln", ".c."]),
   meet1: mug(laptop(sitBase(HEAD_SET))),
   meet2: mug(laptop(sitBase(HEAD_TALK))),
   cook1: cookArm(20),

@@ -204,7 +204,17 @@ function greetCats(a, b) {
 function meetCats(old, fresh) {
   unlock("cats");
   const arrive = pairUp(old, fresh);
-  if (Math.random() < 0.6) {   // boop
+  const r = Math.random();
+  if (r < 0.2) {               // grooming: the old one licks the newcomer's head
+    old.interrupt([...arrive(old), wait(400, "sit"), wait(260, "paw"), wait(200, "sit"), wait(260, "paw"), wait(200, "sit"), wait(260, "paw"),
+      act(() => { old.pop("heart"); fresh.pop("heart"); fresh.say(bubble("prrr", "heart"), 1400); }), wait(1500, "sit"), act(() => { old.runOff = leaveDir(old); })]);
+    fresh.interrupt([...arrive(fresh), wait(3600, "sit"), wait(2000, "sit")]);
+  } else if (r < 0.4) {        // pounce: the newcomer leaps over the old one, who runs off, playing
+    old.interrupt([...arrive(old), wait(900, "sit"), act(() => old.say(bubble(t("scared"), "cat"), 900)), wait(500, "sit"), meow(old, "heart"), act(() => { old.runOff = leaveDir(old); })]);
+    fresh.interrupt([...arrive(fresh), wait(450, "paw"),
+      act(() => { const over = old.cx() + (old.cx() > fresh.cx() ? old.w * 0.6 : -old.w * 0.6) - fresh.w / 2; launch(fresh, clamp(over, 4, fresh.maxX()), fresh.floor(), 0.5); }),
+      landed(), act(() => { fresh.face = old.cx() > fresh.cx() ? 1 : -1; }), meow(fresh, "fire"), wait(2400, "sit")]);
+  } else if (r < 0.7) {        // boop
     old.interrupt([...arrive(old), wait(250, "sit"), act(() => old.pop("heart")), meow(old, "heart"), wait(1600, "sit"), act(() => { old.runOff = leaveDir(old); })]);
     fresh.interrupt([...arrive(fresh), wait(800, "sit"), act(() => fresh.pop("heart")), meow(fresh, "heart"), wait(2400, "sit")]);
   } else {                     // chase

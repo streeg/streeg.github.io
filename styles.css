@@ -435,6 +435,13 @@ html:not(.js) .job-toggle { display: none; }
 .px-emo { flex: none; padding-top: 1px; }
 .px-emo svg { display: block; width: 16px; height: 16px; }
 .px-z { letter-spacing: .15em; color: #52525b; }
+/* a dream: a thought bubble with a little picture, and two dots for a tail */
+.px-dream { display: block; }
+.px-dream svg { display: block; height: 26px; width: auto; max-width: 70px; }
+.px-nightmare svg { animation: px-shiver .18s steps(2) infinite; }
+@keyframes px-shiver { 50% { translate: 1px 0; } }
+.px-bubble:has(.px-dream) { padding: 6px 9px; }
+.px-bubble:has(.px-dream)::after { width: 8px; height: 8px; top: calc(100% + 5px); left: calc(50% - var(--dx, 0px) + 4px); background: #fff; box-shadow: 0 -2px 0 #18181b, 0 2px 0 #18181b, -2px 0 0 #18181b, 2px 0 0 #18181b; }
 .px-keys { display: flex; gap: 7px; margin: 7px 0 2px 2px; }
 .px-keys kbd {
   display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 0; background: #f4f4f5;
@@ -680,6 +687,11 @@ html.px-aquarium .px-horizon[data-phase="dawn"] { background: linear-gradient(to
 html.px-aquarium .px-horizon[data-phase="morning"], html.px-aquarium .px-horizon[data-phase="afternoon"] { background: linear-gradient(to bottom, #38bdf8, #e0f2fe); }
 html.px-aquarium .px-horizon[data-phase="dusk"] { background: linear-gradient(to bottom, #4c1d95, #f472b6); }
 html.px-aquarium .px-horizon[data-phase="evening"] { background: linear-gradient(to bottom, #0f172a, #6d28d9); }
+.px-prop.px-pond { pointer-events: auto; cursor: pointer; }
+.px-rod { position: absolute; inset: 0; pointer-events: none; }
+.px-catch { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 2; }
+.px-catch svg { display: block; width: 100%; height: 100%; }
+html.px-aquarium .px-aqua-hint.px-play { animation: none; opacity: 1; }
 .px-aqua-hint { position: absolute; left: 16px; top: 16px; font: 500 13px "Pixelify Sans", var(--mono); color: rgba(255,255,255,.75); opacity: 0; pointer-events: none; }
 html.px-aquarium .px-aqua-hint { animation: px-hint 5s ease forwards; }
 @keyframes px-hint { 10%, 70% { opacity: 1; } 100% { opacity: 0; } }

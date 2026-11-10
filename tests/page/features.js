@@ -116,14 +116,16 @@ async () => {
   // ---- the laser dot: the cat follows it onto a button, along it, and onto the dev's head
   {
     const move = (x, yy) => window.dispatchEvent(new PointerEvent("pointermove", { pointerType: "mouse", clientX: x, clientY: yy, bubbles: true }));
-    const hold = async (x, yy, ms, done) => { for (let t0 = 0; t0 < ms; t0 += 80) { move(x, yy); await sleep(80); if (done()) return true; } return false; };
+    const at = (v) => (typeof v === "function" ? v() : v);
+    const hold = async (x, yy, ms, done) => { for (let t0 = 0; t0 < ms; t0 += 80) { move(at(x), at(yy)); await sleep(80); if (done()) return true; } return false; };
     window.scrollTo(0, 0); await sleep(300);
     D.me.interrupt([]); readyCat(cat);
     const b0 = document.querySelector(".hero .btn"), rb = b0.getBoundingClientRect();
     move(rb.left + rb.width / 2, rb.top + rb.height / 2);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", bubbles: true }));
     check("laser: the cat climbs onto the button under the dot", await hold(rb.left + rb.width / 2, rb.top + rb.height / 2, 6000, () => cat.mode === "perch" && cat.perchEl === b0), `${cat.mode}`);
-    check("laser: the cat jumps onto the dev's head", await hold(D.me.cx(), D.me.y + D.me.h / 2, 6000, () => cat.mode === "perch" && cat.perch && cat.perch.name === "headPerch"), `${cat.mode}`);
+    D.me.interrupt([(await import("/fun/world.js")).wait(12000, "idle")]);   // he stays put while the dot is on him
+    check("laser: the cat jumps onto the dev's head", await hold(() => D.me.cx(), () => D.me.y + D.me.h / 2, 6000, () => cat.mode === "perch" && cat.perch && cat.perch.name === "headPerch"), `${cat.mode}`);
     window.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", bubbles: true }));
     await sleep(2500);
     check("laser: the cat comes down when it goes off", cat.mode === "ground", cat.mode);

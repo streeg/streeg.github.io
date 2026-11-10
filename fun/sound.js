@@ -90,6 +90,10 @@ const SFX = {
   chirp: () => { tone("square", 2600, 3400, 0.05, 0.18); tone("square", 2900, 3800, 0.05, 0.18, 0.09); },
   wish: () => arp([12, 16, 19, 24, 28], 0.07, "triangle", 0.5, 0.2),
   click: () => tone("square", 1200, 900, 0.03, 0.25),
+  thunder: () => { noise(1.6, 0.55, 260, 0, 40); noise(0.9, 0.35, 160, 0.35, 30); },
+  cast: () => { noise(0.18, 0.3, 2400, 0, 600); },
+  bite: () => { tone("square", 1100, 700, 0.06, 0.35); tone("square", 1100, 700, 0.06, 0.35, 0.1); },
+  splash: () => { noise(0.25, 0.45, 1600, 0, 300); },
 };
 export function sfx(name) { if (enabled && !document.hidden && SFX[name]) SFX[name](); }
 on("sfx", sfx);

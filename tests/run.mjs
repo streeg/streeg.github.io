@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const SUITES = { site: "/pt/?pxdebug", game: "/pt/?pxdebug", friends: "/pt/?pxdebug", features: "/pt/?pxdebug", home: "/pt/?pxdebug" };
+const SUITES = { site: "/pt/?pxdebug", game: "/pt/?pxdebug", friends: "/pt/?pxdebug", features: "/pt/?pxdebug", home: "/pt/?pxdebug", life: "/pt/?pxdebug" };
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".json": "application/json", ".txt": "text/plain", ".xml": "application/xml" };
 
@@ -31,6 +31,9 @@ const browser = await chromium.launch(process.env.CHROME_CHANNEL ? { channel: pr
 async function runSuite(name) {
   const code = await readFile(join(ROOT, "tests/page", name + ".js"), "utf8");
   const context = await browser.newContext({ viewport: { width: 1600, height: 900 }, locale: "pt-BR" });
+  // the real weather and GitHub: answered here, empty, so the checks never depend on the network
+  await context.route(/api\.open-meteo\.com/, (r) => r.fulfill({ status: 200, contentType: "application/json", body: "{}" }));
+  await context.route(/api\.github\.com/, (r) => r.fulfill({ status: 200, contentType: "application/json", body: "[]" }));
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -50,7 +53,7 @@ const wanted = process.argv.slice(2).length ? process.argv.slice(2) : Object.key
 let failures = 0;
 for (const name of wanted) {
   let r = await runSuite(name);
-  if (r.failed.length) { console.log(`\n${name}: ${r.failed.length} failed, retrying once`); r = await runSuite(name); }
+  if (r.failed.length) { console.log(`\n${name}: ${r.failed.length} failed, retrying once`); r.failed.forEach((l) => console.log("  " + l)); r = await runSuite(name); }
   console.log(`\n=== ${name} ===`);
   r.lines.forEach((l) => console.log(l));
   r.failed.filter((l) => l.startsWith("FAIL page error")).forEach((l) => console.log(l));

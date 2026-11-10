@@ -11,6 +11,8 @@ import { burst } from "./ui.js";
 import { HATS, CAT_HATS, PROPS } from "./art/props.js";
 import { toSvg } from "./art/core.js";
 import { unlock } from "./achv.js";
+import { realKind, realWx } from "./forecast.js";
+import { isDay } from "./clock.js";
 
 // ---------------------------------------------------------------- the calendar
 const HOLIDAYS = ["natal", "anonovo", "carnaval", "pascoa", "festajunina", "halloween", "programador", "diagato"];
@@ -47,7 +49,18 @@ function autoSeason() {
 export const effSeason = () => (season === "auto" ? autoSeason() : season);
 const isHoliday = () => HOLIDAYS.includes(effSeason());
 const WEATHER_OF = { natal: "neve", inverno: "neve", outono: "folhas", primavera: "petalas", verao: "sol", carnaval: "confete", programador: "confete", pascoa: "sol" };
-export const effWeather = () => (weather !== "auto" ? weather : WEATHER_OF[effSeason()] || "limpo");
+// Automatic weather: real rain in Brasília always shows; otherwise a holiday keeps its own (snow at Christmas,
+// confetti at Carnival), then the real sky (sun on a clear or hot day), and without it the season's.
+const REAL_OF = { rain: "chuva", storm: "chuva", hot: "sol", clear: "sol", cloudy: "limpo", fog: "limpo" };
+export const weatherAuto = () => weather === "auto";
+export function effWeather() {
+  if (weather !== "auto") return weather;
+  const s = effSeason(), real = realKind();
+  if (real === "rain" || real === "storm") return "chuva";
+  if (isHoliday() && WEATHER_OF[s]) return WEATHER_OF[s];
+  if (real) return REAL_OF[real] === "sol" && !isDay() ? "limpo" : REAL_OF[real];
+  return WEATHER_OF[s] || "limpo";
+}
 const HAT_OF = { natal: "santa", inverno: "beanie", verao: "shades", primavera: "flower", anonovo: "party", carnaval: "mask", pascoa: "bunny", festajunina: "straw", halloween: "witch", programador: "party", diagato: "catears" };
 const CAT_HAT_OF = { natal: "santa", anonovo: "party", programador: "party", halloween: "witch", festajunina: "straw", diagato: "crown" };
 const DECOR_OF = { natal: { frames: ["tree1", "tree2"], every: 520 }, halloween: { frames: ["pumpkin1", "pumpkin2"], every: 380, cls: "px-glow" }, festajunina: { frames: ["fire1", "fire2"], every: 200, cls: "px-glow" } };
@@ -263,7 +276,11 @@ addSystem(() => {
 }, 58);
 
 // ---------------------------------------------------------------- palette
-export const weatherName = () => (weather === "auto" ? `${t("weather.auto")} (${t("weather." + effWeather())})` : t("weather." + weather));
+export const weatherName = () => {
+  if (weather !== "auto") return t("weather." + weather);
+  const wx = realWx();
+  return `${t("weather.auto")} (${t("weather." + effWeather())}${wx ? ` · Brasília ${Math.round(wx.temp)}°C` : ""})`;
+};
 export const seasonName = () => (season === "auto" ? `${t("season.auto")} (${t("season." + effSeason())})` : t("season." + season));
 export function cycleWeather() {
   weather = WEATHERS[(WEATHERS.indexOf(weather) + 1) % WEATHERS.length];
