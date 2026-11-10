@@ -34,6 +34,8 @@ import "./dreams.js";
 import { setLastPush } from "./github.js";
 import { readAlong } from "./reading.js";
 import { fishing, startFishing } from "./fishing.js";
+import "./gadgets.js";
+import { startRun, stopRun, runState } from "./speedrun.js";
 
 // now and then the dev gives a tip for an achievement you have not found yet
 addLineHook(hintLine);
@@ -69,7 +71,7 @@ S.addCommands((raw) => {
 
 // QA only: /?pxdebug exposes the scenes and the villains so each can be checked without waiting for the dice.
 if (/[?&]pxdebug\b/.test(location.search)) {
-  window.PXDEBUG = { W, me, summonBug, spawnTiny, petState, setSeason, holidayOn, openTerminal, ROPE, setFakeHour, ludVisit, pizzaVisit, pingoVisit, shootingStar, setAquarium, setRealWx, setLastPush, readAlong, fishing, startFishing, get rope() { return ropePoints(); }, scene: (name, ...a) => playScene(name, ...a) };
+  window.PXDEBUG = { W, me, summonBug, spawnTiny, petState, setSeason, holidayOn, openTerminal, ROPE, setFakeHour, ludVisit, pizzaVisit, pingoVisit, shootingStar, setAquarium, setRealWx, setLastPush, readAlong, fishing, startFishing, startRun, stopRun, runState, get rope() { return ropePoints(); }, scene: (name, ...a) => playScene(name, ...a) };
 }
 
 // ---------------------------------------------------------------- the friends come in

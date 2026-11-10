@@ -60,6 +60,7 @@ function miss(why) {
   emit("sfx", "splash");
 }
 function pickFish() {
+  if (W.lucky) { W.lucky = false; return "golden"; }   // a wish on a shooting star came true
   const r = Math.random();
   return r < 0.05 ? "golden" : r < 0.2 ? "tucunare" : r < 0.5 ? "tilapia" : "lambari";
 }

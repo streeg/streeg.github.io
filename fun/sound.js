@@ -94,6 +94,8 @@ const SFX = {
   cast: () => { noise(0.18, 0.3, 2400, 0, 600); },
   bite: () => { tone("square", 1100, 700, 0.06, 0.35); tone("square", 1100, 700, 0.06, 0.35, 0.1); },
   splash: () => { noise(0.25, 0.45, 1600, 0, 300); },
+  knock: () => { noise(0.05, 0.7, 500); noise(0.05, 0.7, 500, 0.16); noise(0.05, 0.7, 500, 0.32); },
+  tear: () => { noise(0.22, 0.4, 3500, 0, 1200); },
 };
 export function sfx(name) { if (enabled && !document.hidden && SFX[name]) SFX[name](); }
 on("sfx", sfx);

@@ -1,7 +1,7 @@
 // The dev and the cats together: the feather wand, a cat in his lap at the end of the day,
 // and the coffee mug the cat knocks off while he codes.
 import { t, now, rand, clamp, unit, bubble } from "./util.js";
-import { W, prop, moveProp, wait, walk, act, launch, landed, jumpTo } from "./world.js";
+import { W, api, emit, layer, prop, moveProp, wait, walk, act, launch, landed, jumpTo, addSystem } from "./world.js";
 import { me, freeCat, roomFor, addScene } from "./me.js";
 import { petFeed } from "./pets.js";
 import { toSvg } from "./art/core.js";
@@ -79,7 +79,7 @@ function sceneLap() {
 function knockMug(c) {
   const u = unit();
   const pw = PROPS.puddle[0].length * u, ph = PROPS.puddle.length * u;
-  const puddle = prop(["puddle"], me.x + 27 * u, { quiet: true, keep: () => me.base.startsWith("code") && !W.ko });
+  const puddle = prop(["puddle"], me.x + 27 * u, { quiet: true, keep: () => /^(code|meet|doze)/.test(me.base) && !W.ko });
   puddle.el.style.opacity = "0";
   // the mug falls from where it stood (next to the laptop) and ends up lying on its side in the puddle
   const mug = document.createElement("div");
@@ -99,15 +99,52 @@ function knockMug(c) {
   me.say(bubble(t("together.spill").replace("{name}", c.name), "skull"), 2000);
   unlock("spill");
 }
+// the poses with the mug on the desk; after it falls he codes without it (me.noMug)
+const MUG_POSES = ["code", "code2", "doze", "meet1", "meet2"];
+const hasMug = () => !me.noMug && me.mode === "ground" && !me.locked && MUG_POSES.includes(me.base);
+// the laser (laser.js) asks whether the dot is on the mug, and has the cat knock it off
+api.mugAt = (x, y) => {
+  if (!hasMug()) return false;
+  const u = unit(), lx = me.face < 0 ? me.x + me.w - (x - me.x) : x;   // the frame is mirrored when he faces left
+  return lx > me.x + 25 * u && lx < me.x + 33 * u && y > me.y + 25 * u && y < me.y + 34 * u;
+};
+api.knockMug = (c) => { if (!hasMug()) return; me.noMug = true; knockMug(c); };
+addSystem(() => { if (me.noMug && !/^(code|meet|doze)/.test(me.base)) me.noMug = false; }, 61);
+
+// Java's logo is a cup of coffee: a cat that swats the Java tile in the stack (with the laser, or knocking tiles
+// off) spills it. A mug falls from the tile to the floor and leaves a puddle. (Lud's idea.)
+api.isJava = (el) => !!el && el.classList && el.classList.contains("tech") && !!el.querySelector("span") && el.querySelector("span").textContent.trim() === "Java";
+let javaCool = 0;
+api.javaSpill = (tile, c) => {
+  if (now() < javaCool || W.ko) return;
+  javaCool = now() + 8000;
+  const u = unit(), r = tile.getBoundingClientRect(), mw = PROPS.mug[0].length * u, mh = PROPS.mug.length * u;
+  const x = r.left + r.width / 2 - mw / 2, floorY = innerHeight - mh - 2;
+  const puddle = prop(["puddle"], r.left + r.width / 2 - (PROPS.puddle[0].length * u) / 2, { quiet: true, keep: () => now() < javaCool - 2000 && !W.ko });
+  puddle.el.style.opacity = "0";
+  const mug = document.createElement("div");
+  mug.className = "px-catch";
+  mug.innerHTML = toSvg(PROPS.mug);
+  mug.style.width = mw + "px"; mug.style.height = mh + "px";
+  layer.append(mug);
+  const anim = mug.animate([
+    { transform: `translate(${x}px, ${r.top - mh}px) rotate(0deg)` },
+    { transform: `translate(${x + 10 * u}px, ${r.top - mh - 6 * u}px) rotate(60deg)`, offset: 0.2 },
+    { transform: `translate(${x + 14 * u}px, ${floorY}px) rotate(90deg)` },
+  ], { duration: 900, easing: "cubic-bezier(.5,0,1,.6)", fill: "forwards" });
+  anim.onfinish = () => { puddle.el.style.opacity = ""; emit("sfx", "drop"); setTimeout(() => mug.remove(), 4000); };
+  if (!me.locked) { me.face = r.left + r.width / 2 > me.cx() ? 1 : -1; me.emoteFor("held", 900); me.say(bubble(t("together.javaSpill").replace("{name}", c ? c.name : ""), "coffee"), 2400); }
+  unlock("spill");
+};
+
 function sceneSpill() {
   const u = unit(), c = freeCat();
   if (!c) return;
-  let spilled = false;
   me.queue.push(
     walk(() => roomFor(me, 34 * u), 60),
     wait(rand(12000, 15000), "code", (a) => {
       const tap = Math.floor(now() / 170) % 2;
-      a.setFrame(spilled ? (tap ? "codeN" : "code2N") : (tap ? "code" : "code2"));
+      a.setFrame(me.noMug ? (tap ? "codeN" : "code2N") : (tap ? "code" : "code2"));
     }, (a) => {
       a.face = 1;
       c.interrupt([
@@ -115,12 +152,12 @@ function sceneSpill() {
         walk(() => me.x + 30 * u, 70),   // the mug stands at the right of the laptop
         act(() => { c.face = -1; }),
         wait(900, "sit"), wait(260, "paw"), wait(450, "sit"), wait(260, "paw"),
-        act(() => { if (!me.base.startsWith("code")) return "stop"; spilled = true; knockMug(c); }),
+        act(() => { if (!me.base.startsWith("code") || me.noMug) return "stop"; me.noMug = true; knockMug(c); }),
         walk(() => (me.cx() < innerWidth / 2 ? c.maxX() : 4), 280),
         wait(1500, "sit"),
         act(() => c.say(bubble("mrrp?", "cat"), 1500)),
         wait(2000, "sit"),
-        act(() => { if (spilled && me.base.startsWith("code")) me.say(bubble(t("together.spillAfter"), "coffee"), 2200); }),
+        act(() => { if (me.noMug && me.base.startsWith("code")) me.say(bubble(t("together.spillAfter"), "coffee"), 2200); }),
       ]);
     }));
 }

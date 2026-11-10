@@ -7,6 +7,7 @@ import { FRAMES } from "./art/dev.js";
 import { CAT, CAT_PAL } from "./art/cats.js";
 import { EMOJI } from "./art/icons.js";
 import { ACHV, got, listButtons } from "./achv.js";
+import { runState, runTime } from "./speedrun.js";
 
 const LOCK = ["..cccc..", ".c....c.", ".c....c.", "cccccccc", "ccc..ccc", "ccc..ccc", "cccccccc", "........"];
 const toEl = (svg) => { const d = document.createElement("div"); d.innerHTML = svg; return d.firstChild; };
@@ -29,10 +30,12 @@ export async function makeCard() {
   g.fillText(`${got.size}/${ACHV.length}`, 64, 150);
   g.font = "500 36px 'Pixelify Sans', monospace";
   g.fillText(t("share.title"), 64, 205);
+  const run = runState();
+  if (run && run.end) { g.fillStyle = "#e11d48"; g.fillText(t("run.finished").replace("{time}", runTime()), 64, 250); g.fillStyle = ink; }
   g.fillStyle = soft; g.font = "500 26px 'Pixelify Sans', monospace";
   g.fillText("streeg.github.io", 64, H - 50);
   // the trophies: gold for the ones found, a padlock for the rest
-  const cols = 9, size = 48, gap = 14, x0 = 64, y0 = 260;
+  const cols = 9, size = 48, gap = 14, x0 = 64, y0 = 280;
   const trophy = await art(EMOJI.trophy, size, size), lock = await art(LOCK, size, size);
   ACHV.forEach((k, i) => {
     const x = x0 + (i % cols) * (size + gap), y = y0 + Math.floor(i / cols) * (size + gap);
@@ -55,7 +58,8 @@ export async function makeCard() {
 export async function shareCard() {
   const blob = await makeCard();
   if (!blob) return;
-  const text = `${t("share.text").replace("{n}", got.size).replace("{t}", ACHV.length)} ${location.origin}/`;
+  const run = runState(), time = run && run.end ? ` (${t("run.finished").replace("{time}", runTime())})` : "";
+  const text = `${t("share.text").replace("{n}", got.size).replace("{t}", ACHV.length)}${time} ${location.origin}/`;
   const file = new File([blob], "conquistas.png", { type: "image/png" });
   const phone = window.matchMedia("(pointer: coarse)").matches;
   if (phone && navigator.canShare && navigator.canShare({ files: [file] })) {

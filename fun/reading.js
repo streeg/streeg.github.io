@@ -2,7 +2,7 @@
 // heading, points at it and says something about it, as soon as he is free (once per section per visit).
 // All of them read: an achievement.
 import { $, t, now, pick, clamp, reduced, bubble } from "./util.js";
-import { W, layer, wait, walk, act, addSystem } from "./world.js";
+import { W, on, layer, wait, walk, act, addSystem } from "./world.js";
 import { me } from "./me.js";
 import { unlock } from "./achv.js";
 
@@ -10,6 +10,7 @@ const SECTIONS = ["impact", "experience", "stack", "security", "projects", "orig
 const sectionEl = (k) => (k === "origin" ? $(".origin-section") : $("#" + k));
 const seen = new Set();
 let scrolledAt = 0, checkAt = 0;
+on("speedrun", () => seen.clear());   // a new run: every section counts again
 
 // the section across the upper part of the window (where the eyes are)
 function current() {

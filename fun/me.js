@@ -66,7 +66,8 @@ function reply(text) {
 // typing: two frames, and now and then a thought about the work, a question for Claude or a little emoji
 export const working = (a) => {
   if (a.flowAt && now() > a.flowAt) { a.flowAt = 0; a.flowFromCode = true; setPower(true); a.say(bubble(t("flow"), "fire"), 1800); }
-  a.setFrame(Math.floor(now() / 170) % 2 ? "code" : "code2");
+  const tap = Math.floor(now() / 170) % 2;
+  a.setFrame(a.noMug ? (tap ? "codeN" : "code2N") : (tap ? "code" : "code2"));   // the cat may have knocked the mug off
   if (!a.nextWork) a.nextWork = now() + rand(2500, 4500);
   else if (now() > a.nextWork) {
     if (Math.random() < 0.55) {

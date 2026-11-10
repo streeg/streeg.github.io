@@ -46,6 +46,7 @@ async () => {
   window.scrollTo(0, h.getBoundingClientRect().top + scrollY - 120);
   const spot = () => { const r = h.getBoundingClientRect(); return r.left + Math.min(r.width, 320) / 2; };
   await sleep(300);
+  D.me.interrupt([], true);   // free (not in the middle of a long scene)
   check("reading: the dev reads along", await until(() => { D.readAlong(); return D.me.base === "point" && Math.abs(D.me.cx() - spot()) < 40; }, 15000), `${Math.round(D.me.cx())} vs ${Math.round(spot())}`);
   window.scrollTo(0, 0);
   await sleep(2800);
@@ -66,6 +67,8 @@ async () => {
 
   // the cats meet when the theme changes
   await sleep(1500);
+  D.W.cat.interrupt([], true); D.W.cat.setFrame("sit");   // awake and on the floor, ready to meet the other one
+  await until(() => D.W.cat.mode === "ground", 3000);
   const before = D.W.cat.name;
   $("#toggle-theme").click();
   check("theme: the other cat arrives and they meet", await until(() => D.W.cat.name !== before && achv().includes("cats"), 9000), D.W.cat.name);

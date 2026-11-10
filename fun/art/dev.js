@@ -193,6 +193,7 @@ const RAW = {
   pop2: stamp(wave, 25, 5, [".n.", "nnn", "nln", "nnn", "nln", ".c."]),
   meet1: mug(laptop(sitBase(HEAD_SET))),
   meet2: mug(laptop(sitBase(HEAD_TALK))),
+  meetN: laptop(sitBase(HEAD_SET)),   // headphones on, the mug knocked off
   cook1: cookArm(20),
   cook2: cookArm(18),
   scoop1: scoop(27),

@@ -1,7 +1,7 @@
 // Toys: the ball of yarn (tap to kick, drag to throw, hold and spin to wind it up) whose thread is a rope
 // with physics, and fish treats (double-click the floor).
 import { t, now, rand, clamp, SVGNS, reduced, bubble } from "./util.js";
-import { W, emit, layer, actors, cats, isCat, Actor, wait, walk, until, act, launch, grab, addActorHook, addSystem, showFriends } from "./world.js";
+import { W, emit, layer, actors, cats, isCat, Actor, wait, walk, until, act, launch, landed, hopDown, grab, addActorHook, addSystem, showFriends } from "./world.js";
 import { me, hop } from "./me.js";
 import { petFeed } from "./pets.js";
 import { PROPS } from "./art/props.js";
@@ -354,6 +354,14 @@ function tangle(c) {
   unlock("tangle");
   petFeed(c, "fun", 10);
   c.interrupt([tangledRun(), wait(1200, "sit"), act(() => c.say(bubble("…", "cat"), 1500)), wait(1500, "sit")]);
+}
+// catnip (gadgets.js): the cat goes wild, dashes at the yarn and ends up tangled in it
+export function catnipRush(c) {
+  if (!c || c.leaving || c.tangledUntil || rewinding || c.mode === "held") return false;
+  c.say(bubble("!!", "cat"), 900);
+  const down = c.mode === "perch" ? [hopDown(0), landed()] : [];   // up on something (his head, a card): jump down first
+  c.interrupt([...down, walk(() => clamp(yarn.cx() - c.w / 2, 4, c.maxX()), 300), act(() => tangle(c))]);
+  return true;
 }
 function untangle(c) {
   c.tangledUntil = 0;

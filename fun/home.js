@@ -29,24 +29,24 @@ floor.className = "px-floor";
 layer.insertBefore(floor, layer.firstChild);
 
 // ---------------------------------------------------------------- the furniture
-const items = {};
+export const items = {};
 function item(name, art, onClick, opts = {}) {
   const el = document.createElement("div");
   el.className = "px-furniture px-f-" + name + (opts.cls ? " " + opts.cls : "");
   layer.insertBefore(el, floor.nextSibling);
-  const it = { name, el, art, x: 0, y: 0, w: 0, h: 0, key: "", hidden: false };
+  const it = { name, el, art, x: 0, y: 0, w: 0, h: 0, key: "", hidden: false, lift: 0, pal: opts.pal || PAL };
   el.addEventListener("click", (e) => { e.preventDefault(); if (!W.ko && !me.locked) onClick(it); });
   items[name] = it;
   return it;
 }
-function render(it) {
+export function render(it) {
   const rows = it.art(), key = rows.join("");
   const u = unit();
   it.w = rows[0].length * u; it.h = rows.length * u;
   it.el.style.width = it.w + "px"; it.el.style.height = it.h + "px";
-  it.y = innerHeight - it.h - 2;
+  it.y = innerHeight - it.h - 2 - it.lift * u;   // lift: hung on the wall, or standing on something
   it.el.style.transform = `translate(${Math.round(it.x)}px, ${Math.round(it.y)}px)`;
-  if (key !== it.key) { it.key = key; it.el.innerHTML = toSvg(rows, "", PAL); }
+  if (key !== it.key) { it.key = key; it.el.innerHTML = toSvg(rows, "", it.pal); }
 }
 const lampOn = () => (home.lamp == null ? daylight() < 0.5 : home.lamp);
 const cactusArt = (i) => () => (i ? HOME.ball : HOME.column)[clamp(home.cacti[i].stage, 0, 4)];
@@ -59,19 +59,70 @@ item("lamp", () => (lampOn() ? HOME.lampOn : HOME.lampOff), () => { home.lamp = 
 item("radio", () => (W.radio && radioFrame ? HOME.radio2 : HOME.radio1), () => toggleRadio());
 item("bowl", bowlArt, () => { showFriends(); playScene("feed"); });
 item("litter", () => PROPS.litter, () => { showFriends(); playScene("litter"); });
+item("table", () => HOME.table, () => {}, { cls: "px-f-static" });
 
-// where everything goes: spread along the floor, fewer things on small screens
+// Where everything goes, as corners of one room (fewer things on small screens):
+// the plants on the left (the shelf with the stopwatch on top, the cacti, the catnip), the lamp, the work corner
+// (a side table with the radio and the phone, the headphones on the radio, the clock and the calendar on the wall
+// above it) and the cats' corner (the bowl and the litter box, the window above them). Wall things share a top line.
+const WALL_TOP = 50;   // art pixels above the floor
 function layout() {
-  const w = innerWidth, u = unit(), small = w < 700;
-  const place = (name, x, show = true) => { const it = items[name]; it.x = x; it.hidden = !show; it.el.hidden = !show; render(it); };
-  place("shelf", 10, !small);
-  const c0 = small ? 10 : 10 + 14 * u + 10;
-  place("cactus0", c0);
-  place("cactus1", c0 + 10 * u + 4, !small || w > 420);
-  place("lamp", Math.round(w * (small ? 0.34 : 0.3)));
-  place("radio", Math.round(w * 0.47), !small);
-  place("bowl", Math.round(w * (small ? 0.6 : 0.62)));
-  place("litter", Math.round(w * 0.74), !small);
+  const w = innerWidth, u = unit(), small = w < 700, gap = 2 * u;
+  const size = (n) => { const it = items[n]; if (!it) return 0; render(it); return it.w; };
+  const put = (n, x, opts = {}) => {
+    const it = items[n];
+    if (!it) return null;
+    it.x = Math.round(x); it.lift = opts.lift || 0; it.hidden = opts.show === false; it.el.hidden = it.hidden;
+    render(it);
+    return it;
+  };
+  const hang = (n, x) => { const it = items[n]; if (!it) return null; size(n); return put(n, x, { lift: WALL_TOP - it.h / u }); };
+  const right = (it) => (it ? it.x + it.w : 0);
+
+  // the plant corner
+  const shelf = put("shelf", 10, { show: !small });
+  let x = small ? 10 : right(shelf) + gap;
+  const c0 = put("cactus0", x);
+  x = right(c0) + gap;
+  const c1 = put("cactus1", x, { show: !small || w > 420 });
+  if (!c1.hidden) x = right(c1) + gap;
+  const nip = put("catnip", x, { show: !small || w > 380 });
+  if (nip && !nip.hidden) x = right(nip) + gap;
+  if (small) put("stopwatch", x);   // no shelf: next to the plants
+  else put("stopwatch", shelf.x + shelf.w / 2 - size("stopwatch") / 2, { lift: shelf.h / u - 1 });
+
+  put("lamp", w * (small ? 0.34 : 0.27));
+
+  // the work corner
+  let deskMid;
+  if (small) {
+    put("table", 0, { show: false });
+    put("radio", 0, { show: false });
+    const ph = put("phone", w * 0.48);
+    const hp = put("headphones", right(ph) + gap);
+    deskMid = ph ? (ph.x + right(hp || ph)) / 2 : w * 0.5;
+  } else {
+    const table = put("table", w * 0.4), top = table.h / u - 1;
+    const radio = put("radio", table.x + 2 * u, { lift: top });
+    put("phone", right(table) - size("phone") - 2 * u, { lift: top });
+    put("headphones", radio.x + radio.w / 2 - size("headphones") / 2, { lift: top + radio.h / u - 1 });
+    deskMid = table.x + table.w / 2;
+  }
+  const pair = size("clock") + 3 * u + size("calendar");
+  const clock = hang("clock", deskMid - pair / 2);
+  if (clock) hang("calendar", right(clock) + 3 * u);
+
+  // the cats' corner
+  const bowl = put("bowl", w * (small ? 0.66 : 0.62));
+  const litter = put("litter", right(bowl) + 8 * u, { show: !small });
+  const end = small ? right(bowl) : right(litter);
+  hang("window", (bowl.x + end) / 2 - size("window") / 2);
+}
+// more furniture (gadgets.js, speedrun.js); layout() knows where each one goes
+export function addFurniture(name, art, onClick, opts = {}) {
+  const it = item(name, art, onClick, opts);
+  layout();
+  return it;
 }
 layout();
 on("resize", layout);
@@ -82,6 +133,33 @@ api.bowlX = () => items.bowl.x + items.bowl.w / 2;
 api.lampHead = () => (lampOn() && !items.lamp.hidden ? { x: items.lamp.x + items.lamp.w / 2, y: items.lamp.y + 2 * unit() } : null);
 
 // ---------------------------------------------------------------- the cacti: water them, they grow day by day
+// a day goes by (the calendar on the wall): as if the last watering and growth were a day earlier
+export function passDay() {
+  home.cacti.forEach((c) => { c.water -= 24 * HOUR; c.grew -= 24 * HOUR; });
+  save();
+}
+// a whole season goes by (the season changed from the palette or the terminal): each cactus grows a stage
+on("season", () => {
+  let grew = false, bloomed = false;
+  home.cacti.forEach((c, i) => {
+    if (c.stage >= 4 || items["cactus" + i].hidden) return;
+    c.stage++; c.grew = Date.now(); grew = true;
+    if (c.stage === 4) bloomed = true;
+    render(items["cactus" + i]);
+  });
+  if (!grew) return;
+  save();
+  if (bloomed) unlock("bloom");
+  setTimeout(() => { if (!me.locked) me.say(bubble(t(bloomed ? "home.bloom" : "home.season"), "star"), 2400); }, 2800);   // after the holiday line
+});
+
+// back to the start (a speedrun begins)
+export function resetHome() {
+  home.cacti = [{ stage: 1, water: 0, grew: Date.now() }, { stage: 0, water: 0, grew: Date.now() }];
+  home.bowl = 0.7;
+  save();
+  ["cactus0", "cactus1", "bowl"].forEach((k) => render(items[k]));
+}
 function water(i) {
   const c = home.cacti[i], t0 = Date.now();
   if (t0 - c.water < 2 * HOUR) { me.say(bubble(t("home.tooMuch"), "skull"), 2400); return; }

@@ -290,12 +290,14 @@ export function cycleWeather() {
   S.toast(t("cmds.weather").split("{v}")[0] + weatherName());
 }
 export function setSeason(next) {
+  const was = effSeason();
   season = SEASONS.includes(next) ? next : "auto";
   store.set("px-season", season);
   root.dataset.season = effSeason();
   flakes = []; rockets = []; sparks = []; bats = [];
   showFriends();
   if (isHoliday() && !me.locked) { const lines = t("holiday." + effSeason()); if (lines) me.say(bubble(lines[0], "star"), 2600); }
+  if (effSeason() !== was) emit("season", effSeason());
 }
 export function cycleSeason() {
   setSeason(SEASONS[(SEASONS.indexOf(season) + 1) % SEASONS.length]);

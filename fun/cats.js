@@ -49,6 +49,7 @@ function findKnock(a) {
 export function knockOff(tile, dir) {
   if (!tile.animate || tile.dataset.knocked) return;
   tile.dataset.knocked = "1";
+  if (api.isJava && api.isJava(tile)) api.javaSpill(tile, W.cat);   // the Java tile: its coffee goes too
   const r = tile.getBoundingClientRect();
   const dy = Math.max(0, innerHeight - r.bottom - 4), dx = dir * rand(24, 56), d = dir;
   const anim = tile.animate([

@@ -23,6 +23,7 @@ A small pixel version of me and my cats, Capitu and Sancho, live along the botto
 - `fun/home.js`, `fun/clock.js`, `fun/routine.js`, `fun/daynight.js`, `fun/critters.js`, `fun/visits.js`, `fun/lud.js`, `fun/aquarium.js`: the home corner, the day by the visitor's clock, the sky, the critters, the visits and the screensaver-like aquarium mode
 - `fun/forecast.js`, `fun/outside.js`: the real weather in Brasília (Open-Meteo, no key) and how the little world reacts to it (puddles, the umbrella, a fan on hot days)
 - `fun/dreams.js`, `fun/github.js`, `fun/reading.js`, `fun/fishing.js`: dream bubbles, the reaction to public GitHub pushes, the dev reading along with the visitor, and fishing in aquarium mode
+- `fun/gadgets.js`, `fun/speedrun.js`: the shortcuts in the house (a wall clock that moves the day on, a calendar, a phone, a window, headphones, catnip) and the speedrun stopwatch with its timer
 - `fun/art/`: the pixel art, as character grids
 - `fun/i18n.js`: their copy, in both languages
 

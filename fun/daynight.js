@@ -87,6 +87,7 @@ export function shootingStar() {
     e.preventDefault();
     el.remove();
     unlock("wish");
+    W.lucky = true;   // the next fish is the golden one (fishing.js)
     emit("sfx", "wish");
     if (!me.locked) { me.emoteFor("held", 1200); me.say(bubble(t("sky.wish"), "star"), 2600); }
   });

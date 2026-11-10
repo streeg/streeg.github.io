@@ -65,8 +65,16 @@ export function hintLine() {
   return ["star", `${t("achv.tip")} ${t("achv.hints." + pick(open))}`];
 }
 
-// Extra buttons on the list (the share card adds one).
+// Start over (a speedrun begins): nothing found yet.
+export function resetAchievements() {
+  got.clear();
+  store.set("px-achv", "[]");
+  updateButton();
+}
+
+// Extra buttons on the list (the share card adds one), and extra lines above it (the speedrun timer).
 export const listButtons = [];
+export const listExtras = [];
 export function showAchievements() {
   const row = (k) => {
     const has = got.has(k), hidden = SECRET.has(k) && !has;
@@ -80,5 +88,6 @@ export function showAchievements() {
   }).join("");
   const pct = Math.round((100 * got.size) / ACHV.length);
   const bar = `<div class="px-achv-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${ACHV.length}" aria-valuenow="${got.size}"><i style="width:${pct}%"></i></div>`;
-  return openCard("px-achv-list", t("achv.title"), achvCount(), `${bar}<ul>${html}</ul>`, t("achv.close"), listButtons.map((b) => b()));
+  const extra = listExtras.map((f) => f()).join("");
+  return openCard("px-achv-list", t("achv.title"), achvCount(), `${extra}${bar}<ul>${html}</ul>`, t("achv.close"), listButtons.map((b) => b()).filter(Boolean));
 }

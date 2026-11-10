@@ -3,7 +3,7 @@
 // makes it wobble, or knocks a stack tile off), onto the coin (flipping it), at the yarn, or onto the dev's head.
 // Out of reach (up in the air, under the top bar) they sit below it, staring up and chattering.
 import { S, root, t, now, rand, clamp, unit, finePointer, reduced, typing, bubble } from "./util.js";
-import { W, emit, layer, isCat, wait, landed, launch, hopDown, mouse, addActorHook, addSystem } from "./world.js";
+import { W, api, emit, layer, isCat, wait, landed, launch, hopDown, mouse, addActorHook, addSystem } from "./world.js";
 import { me, headPerch } from "./me.js";
 import { petFeed } from "./pets.js";
 import { yarn, kickYarn } from "./toys.js";
@@ -40,6 +40,7 @@ const within = (x, y, a, pad = 0) => x > a.x - pad && x < a.x + a.w + pad && y >
 let target = null, targetAt = 0;
 function findTarget(c) {
   const x = mouse.x, y = mouse.y;
+  if (api.mugAt && api.mugAt(x, y)) return { kind: "mug" };   // his coffee, next to the laptop (together.js)
   if (within(x, y, me, 4) && me.mode === "ground" && !me.locked) return { kind: "me" };
   if (yarn && within(x, y, yarn, 6)) return { kind: "yarn" };
   if (y > innerHeight - c.h * 2.2) return { kind: "floor" };
@@ -75,6 +76,7 @@ function swat(c, el) {
   emit("sfx", "kick");
   if (!el) return;
   if (el.id === "core") { el.click(); return; }   // flips the coin
+  if (api.isJava && api.isJava(el)) { api.javaSpill(el, c); return; }   // Java's cup of coffee (together.js)
   if (el.classList.contains("tech") && Math.random() < 0.2) {
     const next = c.face > 0 ? el.nextElementSibling : el.previousElementSibling;
     if (next) { knockOff(next, c.face); return; }
@@ -109,6 +111,14 @@ function chase(c, dt) {
   }
 
   // on the floor
+  if (tg.kind === "mug") {   // the dot on his coffee: the cat runs over and paws it off the desk
+    const right = me.face >= 0, u = unit();
+    if (run(c, right ? me.x + 29 * u : me.x + me.w - 29 * u - c.w, dt)) {
+      c.face = right ? -1 : 1;
+      if (now() > (c.pounceCool || 0)) { c.pounceCool = now() + 900; c.emoteFor("paw", 300); api.knockMug(c); }
+    }
+    return;
+  }
   if (tg.kind === "me") {
     if (run(c, me.cx() - c.w / 2 + (c.cx() < me.cx() ? -40 : 40), dt)) launch(c, me.cx() - c.w / 2, me.y - c.h + unit() * 3, 0.5, headPerch);
     return;
