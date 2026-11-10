@@ -1,25 +1,26 @@
 // The dev (a small version of me): head, body parts and every pose, 32×33 pixels.
-import { paint, stamp, dot, box, EMPTY } from "./core.js";
+import { paint, stamp, dot, box, EMPTY, outline } from "./core.js";
 
-const pad = (row) => "........" + row + "........";
-const HEAD = [
-  "......H.HHHH.H..",
-  "....HHHHHHHHHHH.",
-  "..HHHhhHHHhhHHHH",
-  ".fHhhHHHhhHHHhH.",
-  ".ffHHHhHHHHHHff.",
-  ".fffHHHHHHHHfff.",
-  ".SSSSSSSSSSSSSS.",
-  ".SHHHSSSSSSHHHS.",
-  "SSSwESSSSSSwESSS",
-  "RSSSSSSsSSSSSSSS",
-  ".SSSSSSssSSSSSS.",
-  ".SSSSBBBBBBSSSS.",
-  ".sSSSSSmmSSSSSs.",
-  "..sSSSSBBSSSSs..",
-  "...sSSBBBBSSs...",
-  ".....BBBBBB.....",
-].map(pad);
+// The head, 20 wide (wider than the body, chibi style): curly hair swept to his right with shaved sides, thick
+// brows, big eyes with a sparkle, the open goatee (moustache, a gap, the chin), the earring. Built from the
+// left half, mirrored, then the asymmetric bits.
+const pad20 = (row) => "......" + row + "......";
+const mirror = (half) => half + [...half].reverse().join("");
+const setAt = (row, x, s) => row.slice(0, x) + s + row.slice(x + s.length);
+const HEAD_HALF = [
+  "......HHHH", "...HHHHHHH", "..HHhHHHHH", ".HHHHHhHHH", ".HhHHHHHHH", ".ffHHHHHHH", ".fffHHHHSS", ".ffSHHHSSS",
+  "SfSSSSSSSS", "SSSSwESSSS", "SSSSEESSSs", ".sSSSSSSSs", ".SSSSSBBBB", ".sSSSSSSSm", "..sSSSSSSB", "...sSSSSBB",
+];
+export const HEAD = HEAD_HALF.map(mirror).map((r, y) => {
+  if (y === 0) r = ".....HH.HHH.HHHH.HH.";              // curls on top, swept over to his right
+  if (y === 1) r = setAt(r, 16, "HHH");
+  if (y === 2) r = setAt(r, 13, "h");
+  if (y === 4) r = setAt(r, 11, "h");
+  if (y === 9) r = setAt(r, 14, "wE");                    // the right eye: sparkle on the same side
+  if (y === 10) r = setAt(r, 0, "R");                     // the earring
+  return pad20(r);
+});
+export const pad = pad20;
 
 const NECK = [
   "..............SSSS..............",
@@ -58,8 +59,8 @@ const TORSO = [
   "........SSTTTTTTTTTTTTSS........",
   "........SS.VVVVVVVVVV.SS........",
 ];
-const HEAD_CLOSED = HEAD.slice();
-HEAD_CLOSED[8] = pad("SSSssSSSSSSssSSS");
+export const HEAD_CLOSED = HEAD.slice();
+HEAD_CLOSED[9] = pad20(mirror("SSSSSSSSSS"));   // closed eyes: only the lower line
 const idle = HEAD.concat(NECK, TORSO, LEGS_STAND);
 const noRightArm = paint(idle, 22, 20, ["..", "..", "..", "..", "..", ".."]);
 const wave = paint(noRightArm, 22, 11, ["    SS", "    SS", "   SS ", "   SS ", "  SS  ", " TT   ", "TTT   "]);
@@ -100,13 +101,15 @@ const BOOK2 = ["SVkkkkkkWkkkVS", "SVkcckkkWcckVS", ".VkkkkkkWkkkV.", ".Vkccckkkc
 const BOWL = ["..YYcYYYcYY..", "SWWWWWWWWWWWS", "..WWWWWWWWW..", "...WWWWWWW..."];
 // Headset for the daily: grey band over the hair, red ear cups, a little mic.
 const headset = (head) => {
-  let h = dot(head, [[8, 6], [8, 5], [9, 4], [9, 3], [10, 2], [11, 1], [12, 1], [13, 1], [14, 1], [15, 1], [16, 1], [17, 1], [18, 1], [19, 1], [20, 1], [21, 2], [22, 3], [22, 4], [23, 5], [23, 6]], "A");
-  h = box(h, 7, 7, 8, 10, "K");
-  h = box(h, 23, 7, 24, 10, "K");
-  return dot(dot(h, [[9, 11], [10, 12], [11, 12], [12, 12]], "A"), [[13, 12]], "D");
+  const band = [];
+  for (let x = 6; x <= 25; x++) band.push([x, Math.round(7 - 6.5 * Math.sin((Math.PI * (x - 6)) / 19))]);
+  let h = dot(head, band, "A");
+  h = box(h, 5, 8, 6, 11, "K");
+  h = box(h, 25, 8, 26, 11, "K");
+  return dot(dot(h, [[7, 12], [8, 13], [9, 13], [10, 13]], "A"), [[11, 13]], "D");
 };
 const HEAD_SET = headset(HEAD);
-const HEAD_TALK = dot(HEAD_SET, [[15, 12], [16, 12]], "E");
+const HEAD_TALK = dot(HEAD_SET, [[15, 13], [16, 13]], "E");
 // Red electric guitar, standing: double-cutaway body, white pickguard, two pickups, bridge, fretted neck, headstock.
 const electric = (handY) => {
   let f = idle;
@@ -151,8 +154,23 @@ const scoop = (y) => stamp(handsIn(sitBase(HEAD)), 21, y, ["SS.....", "SSAAAA.",
 const POPCORN = ["YWYWY.", "WrWrWr", "WrWrWr", ".rWrW."];
 
 
-export const FRAMES = {
+// Hugging: both arms forward (towards whoever is in front of him).
+const noArms = paint(paint(idle, 8, 22, ["..", "..", "..", ".."]), 22, 22, ["..", "..", "..", ".."]);
+const hug = paint(paint(noArms, 24, 21, ["SSSSSS", "SSSSSS"]), 12, 23, ["SSSSSSSSSSSSSSSSSS"]);
+// A selfie: the phone up in his raised hand.
+const selfie = paint(point, 29, 7, ["xxx", "xLx", "xxx"]);
+
+// Watering the cacti: the right forearm out, a watering can, drops falling from the spout.
+const can = paint(paint(noRightArm, 22, 21, ["SSSS", "SSSS"]), 25, 19, ["..AAA..", ".AAAAAA", "AAAAAAA", ".AAAAA."]);
+const water1 = paint(paint(can, 31, 22, ["O"]), 31, 24, ["O"]);
+const water2 = paint(paint(can, 30, 23, ["O"]), 31, 25, ["O"]);
+
+const RAW = {
   idle,
+  hug,
+  selfie,
+  water1,
+  water2,
   walk1: HEAD.concat(NECK, TORSO_RF, LIFT_L),
   walk2: idle,
   walk3: HEAD.concat(NECK, TORSO_LF, LIFT_R),
@@ -203,7 +221,7 @@ export const FRAMES = {
     "VVVVVVVVVVVVVVVVVVV",
     ".VVVVVVVVVVVVVVVVV.",
     "..VVVVVVVVVVVVVVV..",
-  ]), 0, 26, [".kkkkkkkkkkkkkk.", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkk."]), 0, 17, HEAD_CLOSED.map((r) => r.slice(8, 24))),
+  ]), 0, 26, [".kkkkkkkkkkkkkk.", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", "kkkkkkkkkkkkkkkk", ".kkkkkkkkkkkkkk."]), 0, 17, HEAD_CLOSED.map((r) => r.slice(6, 26))),
   charge: HEAD.concat(NECK, [
     "........TTTTTTTTTTTTTTTT........",
     ".......TTTTTTTTTTTTTTTTT........",
@@ -223,3 +241,5 @@ export const FRAMES = {
     "...........VVVVVVVVVV...........",
   ], LEGS_STANCE),
 };
+// every pose with the dark outline
+export const FRAMES = Object.fromEntries(Object.entries(RAW).map(([k, f]) => [k, outline(f)]));

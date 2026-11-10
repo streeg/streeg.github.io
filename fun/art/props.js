@@ -1,3 +1,4 @@
+import { framed, framedAll } from "./core.js";
 // Props for the little scenes on the floor, and the seasonal headwear.
 const tv = (screen) => [
   "...c......c.....",
@@ -10,7 +11,7 @@ const tv = (screen) => [
   "AAAAAAAAAAAAAAAA",
   ".DD..........DD.",
 ]);
-export const PROPS = {
+const RAW = {
   tv1: tv(["xxLLLLxxx", "xLxxxxLxx", "xLxrxxLxx", "xLxxxxLxx", "xxLLLLxxx"]),
   tv2: tv(["xxxxxxxxx", "xxxLLxxxx", "xxLrxLxxx", "xxxLLxxxx", "xxxxxxxxx"]),
   tvb1: tv(["xxxYYxxxx", "xxxYYxxxx", "xxxxxxxxx", "rrxxxOOxx", "rrrxOOOOx"]),
@@ -65,7 +66,7 @@ export const PROPS = {
 };
 
 // Seasonal headwear, 16 wide, placed over the head (dy = rows above the hair line).
-export const HATS = {
+const RAW_HATS = {
   santa: { dy: -3, rows: ["..........KKWW..", ".......KKKKK.WW.", ".....KKKKKKK....", "....KKKKKKKKK...", "...KKKKKKKKKKK..", "..MMMMMMMMMMMMM.", "..MMMMMMMMMMMMM."] },
   beanie: { dy: -2, rows: ["......OOOO......", "....OOOOOOOO....", "...OOOOOOOOOO...", "..OQOQOQOQOQOQ..", "..OOOOOOOOOOOO.."] },
   shades: { dy: 7, rows: [".xxxxxx..xxxxxx.", "..xxxx....xxxx.."] },
@@ -79,10 +80,15 @@ export const HATS = {
 };
 
 // The cats' headwear, 7 wide, sitting on the ears.
-export const CAT_HATS = {
+const RAW_CAT_HATS = {
   santa: ["....KW.", "..KKK..", ".KKKKK.", "MMMMMMM"],
   witch: ["...xx..", "..xxx..", "..vvv..", "xxxxxxx"],
   party: ["...Y...", "..KVK..", "..VKV..", ".KKVKK."],
   crown: ["Y.Y.Y.Y", "YYrYYYY", "YYYYYYY"],
   straw: ["..YYY..", ".YoYoY.", "YYYYYYY"],
 };
+
+// everything with the dark outline (one pixel bigger on each side)
+export const PROPS = framedAll(RAW);
+export const HATS = Object.fromEntries(Object.entries(RAW_HATS).map(([k, h]) => [k, { dy: h.dy - 1, rows: framed(h.rows) }]));
+export const CAT_HATS = framedAll(RAW_CAT_HATS);

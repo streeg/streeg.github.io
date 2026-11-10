@@ -166,7 +166,7 @@ function restore(pieces, opened) {
   opened.forEach(([el, v]) => { el.style.overflow = v; });
 }
 function shoot(dir, tx, ty) {
-  const u = unit(), bw = 16 * u * 1.6, bh = 9 * u * 1.6;
+  const u = unit(), bw = BLAST[0].length * u * 1.6, bh = BLAST.length * u * 1.6;
   const hx = dir > 0 ? me.x + 31 * u : me.x + me.w - 31 * u;
   const hy = me.y + 20.5 * u;
   const endX = tx != null ? tx : dir > 0 ? innerWidth - bw * 0.6 : bw * 0.6;

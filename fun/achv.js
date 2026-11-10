@@ -10,10 +10,12 @@ import { BADGES } from "./art/badges.js";
 const GROUPS = {
   cats: { pet: "heart", cats: "cat", treat: "fish", lap: "lap", tangle: "knot", spill: "coffee", litter: "litter" },
   dev: { toss: "dev", wake: "sun", dance: "note", flow: "fire", photo: "camera" },
+  home: { water: "can", bloom: "bloom", feed: "bowl" },
   toys: { yarn: "yarn", laser: "laser", coin: "coin" },
   site: { perfect: "target", bottom: "down", terminal: "term", eggs: "choc" },
+  events: { pingo: "pingo", pizza: "pizza", wish: "wish", aquarium: "bowlfish" },
   power: { special: "blast", rebuild: "wrench", bug: "bug", conflict: "merge", friday: "skull" },
-  secrets: { legacy: "crt", sudo: "lock", flag: "flag" },
+  secrets: { legacy: "crt", sudo: "lock", flag: "flag", lud: "lud" },
 };
 const SECRET = new Set(Object.keys(GROUPS.secrets));
 const BADGE = Object.assign({}, ...Object.values(GROUPS));

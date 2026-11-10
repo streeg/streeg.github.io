@@ -4,6 +4,8 @@
 import { S, t, store, rand, pick } from "./util.js";
 import { W, on, addSystem } from "./world.js";
 import { me } from "./me.js";
+import { effWeather } from "./seasons.js";
+import { daylight } from "./clock.js";
 
 let enabled = store.get("px-sound") === "on";
 let ctx = null, master = null, noiseBuf = null;
@@ -84,6 +86,10 @@ const SFX = {
   beep: () => tone("square", 880, 880, 0.08, 0.3),
   wound: () => arp([0, 4, 7, 12], 0.05, "triangle", 0.6, 0.1),
   on: () => arp([0, 7, 12], 0.07, "square", 0.45),
+  doorbell: () => { tone("triangle", N(16), null, 0.5, 0.6); tone("triangle", N(12), null, 0.7, 0.6, 0.45); },
+  chirp: () => { tone("square", 2600, 3400, 0.05, 0.18); tone("square", 2900, 3800, 0.05, 0.18, 0.09); },
+  wish: () => arp([12, 16, 19, 24, 28], 0.07, "triangle", 0.5, 0.2),
+  click: () => tone("square", 1200, 900, 0.03, 0.25),
 };
 export function sfx(name) { if (enabled && !document.hidden && SFX[name]) SFX[name](); }
 on("sfx", sfx);
@@ -104,8 +110,28 @@ on("defeated", (kind) => sfx(kind === "legacy" ? "rebuild" : "win"));
 // while he dances, a little chiptune loop plays (an original tune: bass on the beat, a lead on top)
 const BASS = [0, 0, 7, 7, 5, 5, 7, 7], LEAD = [12, 16, 19, 16, 17, 21, 19, 14];
 let beat = 0, nextBeat = 0;
+// ambience: rain while it rains, crickets at night (quiet, every few seconds)
+let rain = null, nextCricket = 0;
+function rainOn(want) {
+  if (want && !rain && ctx) {
+    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = noiseBuf; src.loop = true;
+    f.type = "lowpass"; f.frequency.value = 1400;
+    g.gain.value = 0.18;
+    src.connect(f); f.connect(g); g.connect(master); src.start();
+    rain = { src, g };
+  } else if (!want && rain) { rain.src.stop(); rain = null; }
+}
 addSystem(() => {
-  if (!enabled || !ctx || W.ko || !me.base.startsWith("dance")) { beat = 0; return; }
+  const live = enabled && ctx && !W.ko && !document.hidden;
+  rainOn(!!(live && effWeather() === "chuva"));
+  if (live && daylight() < 0.3 && performance.now() > nextCricket) {
+    nextCricket = performance.now() + rand(2500, 5000);
+    for (let i = 0; i < 3; i++) tone("triangle", 4300, 4200, 0.04, 0.08, i * 0.07);
+  }
+}, 91);
+addSystem(() => {
+  if (!enabled || !ctx || W.ko || !(me.base.startsWith("dance") || W.radio)) { beat = 0; return; }
   const now = ctx.currentTime;
   if (now < nextBeat) return;
   nextBeat = now + 0.28;

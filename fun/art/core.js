@@ -1,9 +1,9 @@
 // Pixel art basics: the palette, grid helpers and the grid → SVG renderer.
 // Each picture is a grid of characters; "." is transparent and every other character is a colour from PAL.
 export const PAL = {
-  H: "#2b2321", h: "#3a2c28", f: "#4a3a35",              // hair, curl highlight, shaved sides
-  S: "#eab894", s: "#d39a76", w: "#ffffff", E: "#2a1b14", // skin, shadow, eye white, eye
-  B: "#3d2c26", m: "#b0634f", R: "#d4d4d8",              // beard, lip, earring
+  H: "#2e1f1a", h: "#4a3329", f: "#6b5248",              // hair, curl highlight, shaved sides
+  S: "#efbf98", s: "#d99f7a", w: "#ffffff", E: "#24160f", // skin, shadow, eye sparkle, eye
+  B: "#2e1f1a", m: "#b0634f", R: "#d4d4d8",              // beard, lip, earring
   T: "#1c1c20", t: "#3a3a42", V: "#7c3aed",              // black tee, fold, belt
   P: "#52525b", p: "#3f3f46", K: "#e11d48", k: "#f4f4f5", // trousers, sneakers
   G: "#e11d48", g: "#fb7185", y: "#fff1f2",              // energy in the hands
@@ -41,6 +41,22 @@ export const box = (rows, x0, y0, x1, y1, ch) => {
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) pts.push([x, y]);
   return dot(rows, pts, ch);
 };
+
+// A dark outline around a figure: every empty pixel next to a filled one (up, down, left, right).
+export function outline(rows, ch = "x") {
+  return rows.map((row, y) => [...row].map((c, x) => {
+    if (c !== ".") return c;
+    const near = [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dy, dx]) => rows[y + dy] && rows[y + dy][x + dx] && rows[y + dy][x + dx] !== ".");
+    return near ? ch : ".";
+  }).join(""));
+}
+
+// A prop, a hat, a critter: one free pixel added all round, then the outline (so it is never cut off).
+export const framed = (rows, ch = "x") => {
+  const w = rows[0].length + 2, blank = ".".repeat(w);
+  return outline([blank].concat(rows.map((r) => "." + r + "."), [blank]), ch);
+};
+export const framedAll = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, framed(v)]));
 
 // Grid → SVG, merging runs of the same colour on a row into one rect.
 export function toSvg(rows, cls, pal) {

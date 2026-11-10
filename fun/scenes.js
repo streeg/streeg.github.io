@@ -1,7 +1,7 @@
 // The little scenes on the floor (Castaway-style): games, food, books, music, coffee, TV, cooking, the daily, chores.
 // Each one is registered with addScene; the dev's brain picks them at random (or the palette asks for one).
 import { t, now, rand, pick, clamp, unit, bubble } from "./util.js";
-import { W, prop, props, cats, wait, walk, act, launch, landed, jumpTo, hopDown } from "./world.js";
+import { W, api, prop, props, cats, wait, walk, act, launch, landed, jumpTo, hopDown } from "./world.js";
 import { me, freeCat, roomFor, addScene, playScene, working, startCoding } from "./me.js";
 import { summonVisitor } from "./cats.js";
 import { petState } from "./pets.js";
@@ -185,13 +185,13 @@ function sceneCook() {
 function sceneLitter() {
   const u = unit();
   me.queue.push(
-    walk(() => roomFor(me, 14 * u + 8), 60),
+    walk(() => (api.litterX && api.litterX() != null ? clamp(api.litterX() - me.w + 6 * u, 4, me.maxX()) : roomFor(me, 14 * u + 8)), 60),
     wait(6000, "scoop1", (a) => {
       a.setFrame(now() % 900 < 450 ? "scoop1" : "scoop2");
       if (now() > (a.nextTalk || 0)) { a.pop("star"); a.nextTalk = now() + 900; }
     }, (a) => {
       a.face = 1; a.nextTalk = 0;
-      prop(["litter"], a.x + a.w - 4 * u, { keep: () => me.base.startsWith("scoop") && !W.ko });
+      if (!api.litterX || api.litterX() == null) prop(["litter"], a.x + a.w - 4 * u, { keep: () => me.base.startsWith("scoop") && !W.ko });
     }),
     act(() => {
       petState.box = 100;
@@ -217,6 +217,12 @@ addScene("cook", sceneCook);
 addScene("code", () => me.queue.push(wait(rand(8000, 12000), "code", working, startCoding)));
 // a dirty litter box comes first, now and then
 addScene("litter", sceneLitter, { weight: 0, urgent: () => petState.box < 40 && Math.random() < 0.35 });
+
+// A stretch in the morning, arms up, yawning (the routine makes it likely early in the day).
+function sceneStretch() {
+  me.queue.push(wait(2400, "held", null, (a) => a.say(bubble(pick(t("morning")), "coffee"), 2200)), wait(700, "wave"), wait(600, "idle"));
+}
+addScene("stretch", sceneStretch, { weight: 0.3 });
 
 // Palette: put on some music.
 export function dance() { playScene("dance", 9000); }

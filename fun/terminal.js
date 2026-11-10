@@ -3,6 +3,8 @@
 import { S, $, root, t, now, rand, typing, bubble } from "./util.js";
 import { W, emit, wait, walk, act, jumpTo, hopDown, landed, showFriends, layer } from "./world.js";
 import { toggleSound, soundName } from "./sound.js";
+import { ludVisit } from "./lud.js";
+import { setAquarium } from "./aquarium.js";
 import { playScene } from "./me.js";
 import { petState, CATS } from "./pets.js";
 import { summonBug } from "./villains.js";
@@ -121,6 +123,8 @@ const COMMANDS = {
   sudo,
   rm: () => [t("term.permission")],
   ping: () => ["pong"],
+  ssh: (a) => { if ((a[0] || "").toLowerCase().replace(/^.*@/, "") === "lud") { leave(ludVisit); return [t("term.sshLud")]; } return [`ssh: connect to host ${a[0] || "?"} port 22: Connection refused`]; },
+  aquarium: () => { leave(() => setAquarium(true)); return []; },
   sound: (a) => { toggleSound(a[0] === "on" ? true : a[0] === "off" ? false : undefined); return [soundName()]; },
   theme: () => { $("#toggle-theme").click(); return [t("term." + (root.getAttribute("data-theme") === "light" ? "light" : "dark"))]; },
   lang: () => { leave(() => $("#toggle-lang").click()); return []; },
@@ -138,7 +142,7 @@ const COMMANDS = {
   clear: () => { out.textContent = ""; return []; },
   exit: () => { close(); return []; },
 };
-const ALIAS = { som: "sound", ajuda: "help", gatos: "pets", petisco: "treat", cafe: "coffee", "café": "coffee", foto: "photo", clima: "weather", estacao: "season", "estação": "season",
+const ALIAS = { aquario: "aquarium", "aquário": "aquarium", som: "sound", ajuda: "help", gatos: "pets", petisco: "treat", cafe: "coffee", "café": "coffee", foto: "photo", clima: "weather", estacao: "season", "estação": "season",
   conquistas: "achievements", jogar: "play", sair: "exit", quit: "exit", tema: "theme", idioma: "lang", cls: "clear", dir: "ls" };
 
 function run(raw) {

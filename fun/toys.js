@@ -89,7 +89,8 @@ let restFor = 0;       // how long the ball has been still: then the thread sett
 window.addEventListener("scroll", () => { collidersAt = 0; restFor = 0; }, { passive: true });
 window.addEventListener("resize", () => { collidersAt = 0; restFor = 0; });
 function refreshColliders() {
-  colliders = [...document.querySelectorAll(SNAG)].map((el) => el.getBoundingClientRect())
+  // in aquarium mode the page is hidden: nothing to drape over
+  colliders = document.documentElement.classList.contains("px-aquarium") ? [] : [...document.querySelectorAll(SNAG)].map((el) => el.getBoundingClientRect())
     .filter((r) => r.width > 8 && r.height > 8 && r.bottom > -80 && r.top < innerHeight + 80);
   collidersAt = now() + 160;
 }

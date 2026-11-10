@@ -2,7 +2,7 @@
 // things off the stack, the yarn, napping by the dev, sitting on his head), the theme switch (the new cat drops
 // out of the button and the old one leaves) and the other cat's visits.
 import { $, root, t, now, rand, pick, clamp, unit, isNight, finePointer, reduced, bubble } from "./util.js";
-import { W, emit, actors, catNamed, Actor, layer, wait, walk, act, until, landed, launch, jumpTo, hopDown, bind, mouse, addActorHook, addSystem } from "./world.js";
+import { W, api, emit, actors, catNamed, Actor, layer, wait, walk, act, until, landed, launch, jumpTo, hopDown, bind, mouse, addActorHook, addSystem } from "./world.js";
 import { me, headPerch, resting } from "./me.js";
 import { CATS, petState, petOf, petFeed, petStatus } from "./pets.js";
 import { chaseYarn } from "./toys.js";
@@ -67,6 +67,9 @@ export function knockOff(tile, dir) {
 
 function catBrain(a) {
   const r = Math.random(), need = petOf(a);
+  // hungry: the bowl first (home.js), and if it is empty, ask the dev
+  const meal = need && need.food < 45 && Math.random() < 0.4 && api.catEat ? api.catEat(a) : null;
+  if (meal) { a.soft = false; a.queue.push(...meal); return; }
   if (need && need.food < 40 && Math.random() < 0.3 && me.mode === "ground") {
     a.soft = false;
     a.queue.push(walk(() => (me.cx() > a.cx() ? me.x - a.w + 12 : me.x + me.w - 12), 70), act(() => { a.face = me.cx() > a.cx() ? 1 : -1; a.say(bubble(t("pet.hungry"), "fish"), 2000); }), wait(2500, "sit"));
@@ -113,6 +116,9 @@ function catBrain(a) {
     a.queue.push(walk(() => me.x + me.w - 6, 60), wait(rand(12000, 25000), "sleep")); return;
   }
   if (isNight() && r < 0.45) { a.queue.push(wait(rand(15000, 30000), "sleep")); return; }
+  // in the daytime, a nap in the patch of sun on the floor (daynight.js)
+  const nap = Math.random() < 0.12 && api.catNap ? api.catNap(a) : null;
+  if (nap) { a.queue.push(...nap); return; }
 
   if (r < 0.42 && me.mode === "ground") {
     a.soft = false;

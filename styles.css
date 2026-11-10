@@ -643,3 +643,44 @@ html.px-laser-on, html.px-laser-on * { cursor: none !important; }
 .px-term-line label { color: #4ade80; }
 .px-term-line input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: #fafafa; font: inherit; caret-color: #4ade80; }
 @media (max-width: 640px) { .px-term { top: 72px; } }
+/* ---------- the home corner: floor, furniture ---------- */
+:root { --floor-a: #3a2a20; --floor-b: #2a1d16; --floor-o: .9; }
+:root[data-theme="light"] { --floor-a: #caa37a; --floor-b: #a9845c; --floor-o: .85; }
+.px-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; opacity: var(--floor-o); background: repeating-linear-gradient(90deg, var(--floor-a) 0 46px, var(--floor-b) 46px 48px); }
+.px-furniture { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; }
+.px-furniture[hidden] { display: none; }
+.px-furniture svg { display: block; width: 100%; height: 100%; }
+.px-furniture:hover { filter: brightness(1.12) drop-shadow(0 0 4px rgba(var(--tint), .45)); }
+:root[data-theme="dark"] .px-furniture:not(:hover) { filter: drop-shadow(1px 0 0 rgba(255,255,255,.18)) drop-shadow(-1px 0 0 rgba(255,255,255,.18)); }
+.px-lamp-home.px-lit::before { content: ""; position: absolute; left: 50%; top: 0; width: 170px; height: 170px; translate: -50% -38%; border-radius: 50%; background: radial-gradient(circle, rgba(250,204,21,.3), transparent 65%); pointer-events: none; }
+.px-down .px-furniture, .px-down .px-floor, .px-down .px-sunspot, .px-down .px-critter, .px-down .px-carry { visibility: hidden; }
+.px-radio-note { position: absolute; left: 0; top: 0; pointer-events: none; animation: px-note-up 1.1s steps(8) forwards; }
+@keyframes px-note-up { to { opacity: 0; translate: 6px -40px; } }
+.px-carry, .px-critter { position: absolute; left: 0; top: 0; pointer-events: none; }
+.px-carry svg, .px-critter svg { display: block; width: 100%; height: 100%; }
+.px-bird, .px-butterfly { pointer-events: auto; cursor: pointer; }
+/* ---------- day and night ---------- */
+.px-horizon { position: absolute; left: 0; right: 0; bottom: 0; height: 180px; pointer-events: none; opacity: .55; transition: background 2s, height .8s, opacity .8s;
+  background: linear-gradient(to top, var(--sky-a, transparent), transparent); }
+.px-horizon[data-phase="dawn"] { --sky-a: rgba(251,146,60,.28); }
+.px-horizon[data-phase="morning"], .px-horizon[data-phase="afternoon"] { --sky-a: rgba(125,211,252,.12); }
+.px-horizon[data-phase="dusk"] { --sky-a: rgba(236,72,153,.26); }
+.px-horizon[data-phase="evening"] { --sky-a: rgba(99,102,241,.22); }
+.px-horizon[data-phase="night"] { --sky-a: rgba(30,27,75,.4); }
+.px-sunspot { position: absolute; left: 0; bottom: 0; width: 140px; height: 26px; pointer-events: none; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(250,204,21,.22), transparent 70%); transition: transform 2s linear; }
+.px-sunspot[hidden] { display: none; }
+.px-shooting { position: absolute; left: 0; top: 0; width: 64px; height: 18px; padding: 0; border: 0; pointer-events: auto; cursor: pointer; transform-origin: 100% 50%;
+  background: linear-gradient(90deg, transparent, rgba(254,249,195,.85) 85%, #fff 92%, transparent); border-radius: 9px; background-size: 100% 3px; background-repeat: no-repeat; background-position: center; }
+/* ---------- aquarium mode ---------- */
+html.px-aquarium #nav, html.px-aquarium #main, html.px-aquarium .footer, html.px-aquarium .scroll-progress { opacity: 0; visibility: hidden; transition: opacity .8s, visibility 0s .8s; }
+html.px-aquarium, html.px-aquarium body { overflow: hidden; }
+html.px-aquarium .px-horizon { height: 100%; opacity: 1; }
+html.px-aquarium .px-horizon[data-phase="night"] { background: linear-gradient(to bottom, #050816, #1e1b4b); }
+html.px-aquarium .px-horizon[data-phase="dawn"] { background: linear-gradient(to bottom, #312e81, #fb923c); }
+html.px-aquarium .px-horizon[data-phase="morning"], html.px-aquarium .px-horizon[data-phase="afternoon"] { background: linear-gradient(to bottom, #38bdf8, #e0f2fe); }
+html.px-aquarium .px-horizon[data-phase="dusk"] { background: linear-gradient(to bottom, #4c1d95, #f472b6); }
+html.px-aquarium .px-horizon[data-phase="evening"] { background: linear-gradient(to bottom, #0f172a, #6d28d9); }
+.px-aqua-hint { position: absolute; left: 16px; top: 16px; font: 500 13px "Pixelify Sans", var(--mono); color: rgba(255,255,255,.75); opacity: 0; pointer-events: none; }
+html.px-aquarium .px-aqua-hint { animation: px-hint 5s ease forwards; }
+@keyframes px-hint { 10%, 70% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .px-sunspot { transition: none; } }

@@ -69,9 +69,10 @@ function headPos(a, f) {
 }
 function hatFor(a) {
   const s = effSeason();
-  if (a.kind === "me") { const h = HATS[HAT_OF[s]]; return h ? { rows: h.rows, dy: h.dy, w: 16 } : null; }
+  // hats are framed (one pixel bigger all round): w is their full width, and they sit one pixel up and left
+  if (a.kind === "me") { const h = HATS[HAT_OF[s]]; return h ? { rows: h.rows, dy: h.dy, w: h.rows[0].length } : null; }
   const rows = CAT_HATS[CAT_HAT_OF[s]];
-  return rows ? { rows, dy: -(rows.length - 1), w: 7 } : null;
+  return rows ? { rows, dy: -(rows.length - 2), w: rows[0].length } : null;
 }
 function dress(a) {
   if (!a.hatEl) { a.hatEl = document.createElement("div"); a.hatEl.className = "px-hat"; a.el.append(a.hatEl); }
@@ -86,7 +87,7 @@ function placeHat(a) {
   const f = a.shown(), key = f + a.face;
   if (key === a.hatKey) return;
   a.hatKey = key;
-  const u = unit(), hp = headPos(a, f), W0 = a.frames[f][0].length, x = a.face < 0 ? W0 - hp.x - a.hat.w : hp.x;
+  const u = unit(), hp = headPos(a, f), W0 = a.frames[f][0].length, x = a.face < 0 ? W0 - (hp.x - 1) - a.hat.w : hp.x - 1;
   a.hatEl.style.width = a.hat.w * u + "px";
   a.hatEl.style.transform = `translate(${x * u}px, ${(hp.y + a.hat.dy) * u}px)` + (a.face < 0 ? " scaleX(-1)" : "");
 }
@@ -158,9 +159,12 @@ function bunting(g, ts) {
   }
 }
 let skyDrew = false;
+// other features draw on the same sky (stars, fireflies, a rainbow): { active(): bool, draw(g, dt, ts) }
+const skyLayers = [];
+export const addSkyLayer = (l) => skyLayers.push(l);
 function tickSky(dt, ts) {
   const w = effWeather(), s = effSeason(), g = sky.getContext("2d");
-  const extras = s === "anonovo" || s === "halloween" || s === "festajunina";
+  const extras = s === "anonovo" || s === "halloween" || s === "festajunina" || skyLayers.some((l) => l.active());
   const draws = !W.ko && !layer.hidden && (w === "sol" || snowDepth > 0.5 || extras || (!reduced() && (SKY_N[w] || 0) > 0));
   if (!draws && !skyDrew) return;
   g.clearRect(0, 0, sky.width, sky.height);
@@ -171,6 +175,7 @@ function tickSky(dt, ts) {
     grad.addColorStop(0, "rgba(250,204,21,.22)"); grad.addColorStop(1, "rgba(250,204,21,0)");
     g.fillStyle = grad; g.fillRect(0, 0, sky.width, 360);
   }
+  skyLayers.forEach((l) => { if (l.active()) l.draw(g, dt, ts); });
   if (s === "festajunina") bunting(g, ts);
   if (!reduced() && s === "anonovo") fireworks(g, dt);
   if (!reduced() && s === "halloween") flyBats(g, dt, ts);
@@ -231,7 +236,7 @@ function hideEggs() {
     const el = document.createElement("button");
     el.type = "button"; el.className = "px-egg"; el.tabIndex = -1;
     el.innerHTML = toSvg(PROPS.egg);
-    const u = unit(); el.style.width = 5 * u + "px"; el.style.height = 6 * u + "px";
+    const u = unit(); el.style.width = PROPS.egg[0].length * u + "px"; el.style.height = PROPS.egg.length * u + "px";
     eggBox.append(el);
     const e = { el, i, k: Math.random() };
     el.addEventListener("click", (ev) => {

@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const SUITES = { site: "/pt/?pxdebug", game: "/pt/?pxdebug", friends: "/pt/?pxdebug", features: "/pt/?pxdebug" };
+const SUITES = { site: "/pt/?pxdebug", game: "/pt/?pxdebug", friends: "/pt/?pxdebug", features: "/pt/?pxdebug", home: "/pt/?pxdebug" };
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".json": "application/json", ".txt": "text/plain", ".xml": "application/xml" };
 

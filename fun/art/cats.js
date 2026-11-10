@@ -1,84 +1,78 @@
-// The cats, side view facing right: b body, d stripes, l belly, e eyes, n nose, k closed eyes.
+// The cats, chibi style with a dark outline: a big round head (looking at you) on a side-view body facing right.
+// b body, d stripes, l belly, e eyes, n nose, k closed eyes, x outline.
 // Capitu (black, lightly striped) lives in the dark theme, Sancho (grey) in the light one.
+import { outline } from "./core.js";
+
 export const CAT_PAL = {
-  capitu: { b: "#1c1615", d: "#5a3d28", l: "#2c221f", e: "#f5a524", n: "#4a3632", k: "#7a5c48" },
-  sancho: { b: "#767c88", d: "#5c616c", l: "#a3a9b4", e: "#e6c22e", n: "#5f5458", k: "#3a3d44" },
+  capitu: { b: "#231b19", d: "#5a3d28", l: "#3a2c27", e: "#f5b324", n: "#e58a9a", k: "#8a6a55", x: "#0e0a09" },
+  sancho: { b: "#808794", d: "#626875", l: "#b3b9c4", e: "#e9c531", n: "#e58a9a", k: "#3a3d44", x: "#2a2c33" },
 };
-const W22 = (rows) => rows.map((r) => r.padEnd(22, "."));
-const CAT_HEAD = [
-  "..............b.....b",
-  "..............bb...bb",
-  ".d............bbbbbbb",
-  ".b............bebbbeb",
-  "..b...........bbbnbbb",
+const SIT_HEAD = [
+  "..............b....b....",
+  ".............bbb..bbb...",
+  ".............bbbbbbbb...",
+  ".............bebbbbeb...",
+  ".............bebbbbeb...",
 ];
+// 24×12: the figure stands on the bottom (10 rows of art), with a free pixel all round for the outline
+const frame = (rows) => outline([""].concat(Array(Math.max(0, 10 - rows.length)).fill(""), rows, [""]).map((r) => r.padEnd(24, ".")));
 export const CAT = {
-  walk1: W22(CAT_HEAD.concat([
-    "..b.bbbbbbbbbbbbbbbb",
-    "...bbdbbdbbdbbbbbbb",
-    "....bbbbbbbbbbbbbbb",
-    "....bblllllllllbbb",
-    "....bb.bb...bb.bb",
-    "...bb..bb....bb..bb",
+  sit: frame(SIT_HEAD.concat([
+    "..........bbbbbbnnbbb...",
+    ".........bbdbbbbbbbb....",
+    "........bbbbbbbllllbb...",
+    "...dd..bbbbbbbbllllbb...",
+    "....dbbbbbbbbbbbbbbbb...",
   ])),
-  walk2: W22(CAT_HEAD.concat([
-    "..b.bbbbbbbbbbbbbbbb",
-    "...bbdbbdbbdbbbbbbb",
-    "....bbbbbbbbbbbbbbb",
-    "....bblllllllllbbb",
-    ".....bbb.....bbb",
-    "....bb.bb...bb.bb",
+  paw: frame(SIT_HEAD.concat([
+    "..........bbbbbbnnbbbbb.",
+    ".........bbdbbbbbbbbbb..",
+    "........bbbbbbbllllbb...",
+    "...dd..bbbbbbbbllllbb...",
+    "....dbbbbbbbbbbbbbb.....",
   ])),
-  sit: W22([
-    "..............b.....b",
-    "..............bb...bb",
-    "..............bbbbbbb",
-    "..............bebbbeb",
-    "..............bbbnbbb",
-    "..........bbbbbbbbbb",
-    ".........bbdbbdbbbbb",
-    "........bbbbbbllllbb",
-    ".......bbbbbbbllllbb",
-    "...dbbbbbbbbbbllllbb",
-    "....bbbbbbbbbb.bb.bb",
+  walk1: frame([
+    "..............b....b....",
+    ".............bbb..bbb...",
+    ".d...........bbbbbbbb...",
+    ".b...........bebbbbeb...",
+    "..b..........bebbbbeb...",
+    "..bbbbbbbbbbbbbbnnbbb...",
+    "...bbdbbdbbdbbbbbbbb....",
+    "...bblllllllllbbbb......",
+    "....bb.bb...bb.bb.......",
   ]),
-  paw: W22([
-    "..............b.....b",
-    "..............bb...bb",
-    "..............bbbbbbb",
-    "..............bebbbeb",
-    "..............bbbnbbbb",
-    "..........bbbbbbbbbbbb",
-    ".........bbdbbdbbbbb",
-    "........bbbbbbllllbb",
-    ".......bbbbbbbllllbb",
-    "...dbbbbbbbbbbllllbb",
-    "....bbbbbbbbbb.bb...",
+  walk2: frame([
+    "..............b....b....",
+    ".............bbb..bbb...",
+    "..d..........bbbbbbbb...",
+    ".b...........bebbbbeb...",
+    "..b..........bebbbbeb...",
+    "..bbbbbbbbbbbbbbnnbbb...",
+    "...bbdbbdbbdbbbbbbbb....",
+    "...bblllllllllbbbb......",
+    "...bb..bbb..bb..bb......",
   ]),
-  sleep: W22([
+  sleep: frame([
     "",
     "",
     "",
     "",
-    "",
-    "...............b...b",
-    "..........bbbbbbbbbbb",
-    "........bbbbbbbbbkbbkb",
-    ".......bbdbbdbbbbbbnbb",
-    "......bbbbbbbbbbbbbbbb",
-    ".....dbbbbbbbbbbbbbbb",
+    ".............b...b......",
+    "........bbbbbbbbbbbb....",
+    "......bbbbbbbbbbkbbkb...",
+    ".....bbdbbdbbbbbbbnbb...",
+    "....dbbbbbbbbbbbbbbbb...",
   ]),
-  jump: W22([
+  jump: frame([
     "",
-    "",
-    "...............b.....b",
-    "...............bb...bb",
-    ".dd............bbbbbbb",
-    "...dbbbbbbbbbbbbebbbeb",
-    "....bbdbbdbbdbbbbbnbbb",
-    "...bbllllllllllbbbbbb",
-    ".bb................bb",
-    "b...................bb",
-    "",
+    "...............b....b...",
+    "..............bbb..bbb..",
+    ".dd...........bbbbbbbb..",
+    "...dbbbbbbbbbbbebbbbeb..",
+    "....bbdbbdbbdbbebbbbeb..",
+    "...bbllllllllllbbnnbbb..",
+    ".bb...............bbb...",
+    "b..................bb...",
   ]),
 };

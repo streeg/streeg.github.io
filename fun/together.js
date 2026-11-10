@@ -16,8 +16,8 @@ function sceneWand() {
   if (!c) return;
   let wand = null;
   // where the feather is (it swings between two spots), and where the stick sits in his raised hand
-  const tip = () => (wand ? { x: wand.x + (wand.i ? 11.5 : 14.5) * u, y: wand.y + 7 * u } : null);
-  const grip = () => ({ x: me.x + 30 * u, y: me.y + 5 * u });
+  const tip = () => (wand ? { x: wand.x + (wand.i ? 12.5 : 15.5) * u, y: wand.y + 8 * u } : null);   // the wand art is framed (+1 all round)
+  const grip = () => ({ x: me.x + 29 * u, y: me.y + 4 * u });
   const jumps = (n) => Array.from({ length: n }, () => [
     walk(() => { const p = tip(); return p ? p.x - c.w / 2 : null; }, 160),
     act(() => { c.face = 1; }),
@@ -49,7 +49,7 @@ function sceneLap() {
   const u = unit(), c = freeCat();
   if (!c) return;
   // the cat curls up against him, facing right (its body is drawn a little off-centre in the frame)
-  const lap = (a) => (me.base.startsWith("lap") && !me.locked ? { x: me.x + (a.face < 0 ? 8 : 3) * u, y: me.y + 21 * u } : null);
+  const lap = (a) => (me.base.startsWith("lap") && !me.locked ? { x: me.x + (a.face < 0 ? 8 : 3) * u, y: me.y + me.h - a.h - u } : null);
   me.queue.push(
     walk(() => clamp(me.x, 40, innerWidth - me.w - 40), 50),
     wait(rand(11000, 14000), "lap1", (a) => {
@@ -85,9 +85,10 @@ function knockMug(c) {
   const mug = document.createElement("div");
   mug.className = "px-mug";
   mug.innerHTML = toSvg(PROPS.mug);
-  mug.style.width = 5 * u + "px"; mug.style.height = 5 * u + "px";
+  const mw = PROPS.mug[0].length * u, mh = PROPS.mug.length * u;
+  mug.style.width = mw + "px"; mug.style.height = mh + "px";
   puddle.el.append(mug);
-  const sx = me.x + 27 * u - puddle.x, sy = me.y + 28 * u - puddle.y, ex = pw / 2 - 2.5 * u, ey = ph - 5 * u;
+  const sx = me.x + 26 * u - puddle.x, sy = me.y + 27 * u - puddle.y, ex = pw / 2 - mw / 2, ey = ph - mh;
   const anim = mug.animate([
     { transform: `translate(${sx}px, ${sy}px) rotate(0deg)` },
     { transform: `translate(${sx + 8 * u}px, ${sy - 3 * u}px) rotate(40deg)`, offset: 0.3 },

@@ -22,5 +22,13 @@ const NEW = {
   merge: ["O......r", "O......r", ".O....r.", "..O..r..", "...vv...", "...vv...", "...vv...", "...vv..."],
   crt: ["JJJJJJJJ", "JxxxxxxJ", "JxNxxNxJ", "JxxxxxxJ", "JxNNNNxJ", "JJJJJJJJ", "..JJJJ..", ".DDDDDD."],
   flag: ["Dr......", "Drrrr...", "Drrrrrr.", "Drrrr...", "Dr......", "D.......", "D.......", "DD......"],
+  can: ["......O.", "....AA.O", ".AAAAAA.", "AAAAAAAA", "AAAAAA..", "AAAAAA..", ".AAAA...", "........"],
+  bloom: ["...nn...", "..nYn...", "...NN...", ".N.NN.N.", ".NNNNNN.", "...NN...", "..ZZZZ..", "..ZZZZ.."],
+  bowl: ["........", "........", "..zZzZ..", ".zZzZzZ.", "rrrrrrrr", ".rrrrrr.", "..rrrr..", "........"],
+  wish: ["Y.......", ".Y......", "..Y.....", "...Y.Y..", "....YWY.", ".....Y..", "........", "........"],
+  pizza: ["oooooooo", "YYYYYYYY", ".YrYYrY.", ".YYYrYY.", "..YrYY..", "..YYY...", "...Y....", "........"],
+  pingo: ["o.....o.", "oo...oo.", "ooooooo.", "oNoooNo.", "ooooooo.", "ooonooo.", ".ooooo..", "........"],
+  bowlfish: ["..cccc..", ".c....c.", "cQQQQQQc", "cQYYQQQc", "cQYYYQQc", "cQQQQQQc", ".cQQQQc.", "..cccc.."],
+  lud: ["........", ".dd..dd.", "dWdddddd", "dddddddd", "dddddddd", ".dddddd.", "..dddd..", "...dd..."],
 };
 export const BADGES = Object.assign({}, EMOJI, NEW, { yarn: PROPS.yarn });

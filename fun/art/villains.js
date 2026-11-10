@@ -1,3 +1,4 @@
+import { framed, framedAll } from "./core.js";
 // "The Bug" and the red energy blast that defeats it.
 const bugBody = [
   "...x........x...",
@@ -15,13 +16,13 @@ const bugBody = [
   ".....xxxxxx.....",
 ];
 const bugFrame = (a, b) => bugBody.map((r) => (r === "LEGS_A" ? a : r === "LEGS_B" ? b : r));
-export const BUG = {
+const RAW_BUG = {
   bug1: bugFrame("x..xVVVxxVVVx..x", "x..xVVVxxVVVx..x"),
   bug2: bugFrame(".x.xVVVxxVVVx.x.", ".x.xVVVxxVVVx.x."),
 };
 
 // The red energy blast, travelling right.
-export const BLAST = [
+const RAW_BLAST = [
   "........rrrrr...",
   "....rr.rrllllrr.",
   ".rr..rrrlyyyylrr",
@@ -56,9 +57,14 @@ const crt = (eye, code, legs) => [
 ].concat(legs);
 const LEGS1 = ["....x..x........x..x......", "...x....x......x....x.....", "..x......x....x......x...."];
 const LEGS2 = [".....x..x......x..x.......", ".....x...x....x...x.......", "....x.....x..x.....x......"];
-export const BOSS = {
+const RAW_BOSS = {
   legacy1: crt("Y", "NNxNxNNNxNxNNx", LEGS1),
   legacy2: crt("Y", "NxNNNxNxNNxNNN", LEGS2),
   angry1: crt("r", "NNxNxNNNxNxNNx", LEGS1),
   angry2: crt("r", "NxNNNxNxNNxNNN", LEGS2),
 };
+
+// with the dark outline
+export const BUG = framedAll(RAW_BUG);
+export const BOSS = framedAll(RAW_BOSS);
+export const BLAST = framed(RAW_BLAST);

@@ -20,6 +20,7 @@ A small pixel version of me and my cats, Capitu and Sancho, live along the botto
 - `fun/world.js`: the engine (actors, props, tasks, physics, input, the main loop)
 - `fun/me.js`, `fun/scenes.js`, `fun/cats.js`, `fun/together.js`: the dev, his scenes, the cats, and the three of them together
 - `fun/toys.js`, `fun/pets.js`, `fun/villains.js`, `fun/special.js`, `fun/seasons.js`, `fun/terminal.js`, `fun/sound.js` and friends: one feature each
+- `fun/home.js`, `fun/clock.js`, `fun/routine.js`, `fun/daynight.js`, `fun/critters.js`, `fun/visits.js`, `fun/lud.js`, `fun/aquarium.js`: the home corner, the day by the visitor's clock, the sky, the critters, the visits and the screensaver-like aquarium mode
 - `fun/art/`: the pixel art, as character grids
 - `fun/i18n.js`: their copy, in both languages
 

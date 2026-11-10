@@ -165,7 +165,7 @@ on("activity", (quiet) => { if (quiet > 20000 && !W.ko && resting(me) && me.mode
 export function nightProps(a) {
   if (!isNight()) return;
   const u = unit(), keep = () => me.base === "lie" && !W.ko;
-  prop(["lamp"], a.x - 7 * u - 2, { cls: "px-lamp", keep });
+  if (!api.lampX || api.lampX() == null) prop(["lamp"], a.x - 7 * u - 2, { cls: "px-lamp", keep });   // no lamp at home: bring one
   for (let i = 0; i < 3; i++) prop(["twinkle"], a.x + rand(-10, a.w), { y: a.y + rand(-30, 20), cls: "px-twinkle", keep, quiet: true }).el.style.animationDelay = (i * 0.45) + "s";
 }
 
@@ -192,8 +192,11 @@ export function playScene(name, ...args) {
   return true;
 }
 let sceneCool = now() + 6000;
+// the routine of the day scales each scene's weight (morning coffee, evening TV…): fn(name) → factor
+let routine = () => 1;
+export const setRoutine = (fn) => { routine = fn; };
 function randomScene() {
-  const list = SCENES.map((s) => ({ s, w: weightOf(s) })).filter((x) => x.w > 0), total = list.reduce((n, x) => n + x.w, 0);
+  const list = SCENES.map((s) => ({ s, w: weightOf(s) * routine(s.name) })).filter((x) => x.w > 0), total = list.reduce((n, x) => n + x.w, 0);
   let r = Math.random() * total;
   return (list.find((x) => (r -= x.w) < 0) || list[0]).s;
 }
@@ -202,7 +205,11 @@ me.brain = (a) => {
   if (catOnHead()) { a.queue.push(wait(900, "idle", lookAtCursor)); return; }
   const quiet = now() - input.last;
   a.nextWork = 0;
-  if (isNight() && quiet > 8000 && Math.random() < 0.6) { a.queue.push(walk(rand(20 + 8 * unit(), a.maxX()), 45), wait(rand(20000, 40000), "lie", snore, nightProps)); return; }
+  if (isNight() && quiet > 8000 && Math.random() < 0.6) {   // bedtime: next to the lamp
+    const lx = api.lampX && api.lampX();
+    a.queue.push(walk(lx != null ? lx + 8 * unit() : rand(20 + 8 * unit(), a.maxX()), 45), wait(rand(20000, 40000), "lie", snore, nightProps));
+    return;
+  }
   if (quiet > 75000) { a.queue.push(wait(rand(20000, 40000), "lie", snore, nightProps)); return; }
   if (quiet > 45000) { a.queue.push(wait(rand(9000, 14000), "doze", snore)); return; }
   if (quiet > 20000) { a.queue.push(wait(rand(9000, 14000), "code", working, startCoding)); return; }

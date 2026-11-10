@@ -17,6 +17,8 @@ export const W = {
   fighting: false,   // a special attack against a villain is under way
   laser: false,      // the red dot is on (Shift held)
   tiny: null,        // the tiny bug crawling on a card
+  // QA (/?pxdebug): no random visits or events, so the checks are not interrupted (they still work when called)
+  calm: /[?&]pxdebug/.test(location.search),
 };
 const listeners = {};
 export const on = (name, fn) => { (listeners[name] = listeners[name] || []).push(fn); };
@@ -324,11 +326,13 @@ function loop(ts) {
 export function start() { if (!raf && !layer.hidden && !document.hidden) { last = 0; raf = requestAnimationFrame(loop); } }
 export function stop() { cancelAnimationFrame(raf); raf = 0; }
 document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
-window.addEventListener("resize", () => {
+// the window changed size (or the world zoomed in): everything is measured again
+export function rescale() {
   actors.forEach((a) => { a.size(); if (a.mode === "ground") a.y = a.floor(); a.x = clamp(a.x, 4, a.maxX()); a.cache = {}; a.frame = ""; });
   props.forEach((pr) => dropProp(pr, true));
   emit("resize");
-});
+}
+window.addEventListener("resize", rescale);
 
 // Show / hide the friends (palette, or remembered from last time).
 export function togglePets() {

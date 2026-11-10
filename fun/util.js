@@ -19,8 +19,14 @@ export const reduced = () => S.reduced();
 export const GRAV = 2200;
 export const SVGNS = "http://www.w3.org/2000/svg";
 export const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-export const unit = () => (innerWidth < 640 ? 2 : 2.5);   // CSS pixels per art pixel
-export const isNight = () => { const h = new Date().getHours(); return h >= 23 || h < 6; };
+// zoom grows the whole little world (aquarium mode)
+export const view = { zoom: 1 };
+export const unit = () => (innerWidth < 640 ? 2 : 2.5) * view.zoom;   // CSS pixels per art pixel
+// the hour of the day, with minutes as a fraction (QA can pretend it is another time)
+let fakeHour = null;
+export const setFakeHour = (h) => { fakeHour = h; };
+export const hourNow = () => { if (fakeHour != null) return fakeHour; const d = new Date(); return d.getHours() + d.getMinutes() / 60; };
+export const isNight = () => { const h = hourNow(); return h >= 23 || h < 6; };
 // true while the visitor is typing somewhere (keys belong to that field, not to the friends)
 export const typing = () => /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName) || !!(document.activeElement && document.activeElement.isContentEditable);
 

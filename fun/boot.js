@@ -18,6 +18,14 @@ import { open as openTerminal } from "./terminal.js";
 import { shareCard } from "./share.js";
 import { toggleSound, soundOn } from "./sound.js";
 import "./together.js";
+import "./routine.js";
+import { toggleRadio } from "./home.js";
+import { shootingStar } from "./daynight.js";
+import "./critters.js";
+import { pingoVisit, pizzaVisit } from "./visits.js";
+import { ludVisit } from "./lud.js";
+import { setAquarium } from "./aquarium.js";
+import { setFakeHour } from "./util.js";
 import "./catreact.js";
 import "./reactions.js";
 
@@ -44,13 +52,17 @@ S.addCommands((raw) => {
     { k: "achievements conquistas trophy", label: `${c.achievements} (${achvCount()})`, icon: "game", run: showAchievements },
     { k: "share compartilhar conquistas achievements", label: c.share, icon: "game", run: shareCard },
     { k: "terminal console shell bash", label: c.terminal, icon: "game", run: openTerminal },
+    { k: "water cactus regar cacto planta", label: c.water, icon: "game", run: () => { showFriends(); playScene("water"); } },
+    { k: "feed bowl racao pote comida gatos", label: c.feed, icon: "game", run: () => { showFriends(); playScene("feed"); } },
+    { k: "radio musica music", label: c.radio, icon: "game", run: () => { showFriends(); toggleRadio(); } },
+    { k: "aquarium aquario screensaver descanso", label: c.aquarium, icon: "game", run: () => setAquarium(true) },
     { k: "sound som audio 8-bit musica music", label: c.sound.replace("{v}", t(soundOn() ? "sound.on" : "sound.off")), icon: "game", run: () => toggleSound() },
   ];
 });
 
 // QA only: /?pxdebug exposes the scenes and the villains so each can be checked without waiting for the dice.
 if (/[?&]pxdebug\b/.test(location.search)) {
-  window.PXDEBUG = { W, me, summonBug, spawnTiny, petState, setSeason, holidayOn, openTerminal, ROPE, get rope() { return ropePoints(); }, scene: (name, ...a) => playScene(name, ...a) };
+  window.PXDEBUG = { W, me, summonBug, spawnTiny, petState, setSeason, holidayOn, openTerminal, ROPE, setFakeHour, ludVisit, pizzaVisit, pingoVisit, shootingStar, setAquarium, get rope() { return ropePoints(); }, scene: (name, ...a) => playScene(name, ...a) };
 }
 
 // ---------------------------------------------------------------- the friends come in
