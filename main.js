@@ -381,12 +381,14 @@
   const pageRegions = () => [$("#nav"), $("#main"), $(".footer")];
   let items = [], sel = 0, lastFocus = null;
   const go = (id) => () => document.getElementById(id).scrollIntoView({ behavior: smooth() });
+  // Other scripts add their own commands (the pixel friends do): fn(typed text) → [{ k, label, icon, run, first }].
+  const providers = [];
   function commands() {
     const c = t("palette.cmds");
     const raw = input.value.trim();
-    const flag = /^flag\{.+\}$/i.test(raw) ? [{ k: raw.toLowerCase(), label: `${c.flag}: ${raw}`, icon: "game", run: () => window.FUN && window.FUN.checkFlag(raw) }] : [];
+    const more = providers.flatMap((fn) => { try { return fn(raw) || []; } catch (e) { return []; } });
     return [
-      ...flag,
+      ...more.filter((m) => m.first),
       { k: "impact", label: c.impact, icon: "arrow", run: go("impact") },
       { k: "experience", label: c.experience, icon: "arrow", run: go("experience") },
       { k: "stack", label: c.stack, icon: "arrow", run: go("stack") },
@@ -394,18 +396,7 @@
       { k: "projects", label: c.projects, icon: "arrow", run: go("projects") },
       { k: "contact", label: c.contact, icon: "arrow", run: go("contact") },
       { k: "play", label: c.play, icon: "game", run: () => game.focus() },
-      { k: "special attack ataque energia", label: c.special, icon: "game", run: () => window.FUN && window.FUN.special() },
-      { k: "pets friends cats", label: c.friends, icon: "game", run: () => window.FUN && window.FUN.togglePets() },
-      { k: "treat fish petisco peixe", label: c.treat, icon: "game", run: () => window.FUN && window.FUN.treat() },
-      { k: "yarn rewind novelo enrolar linha", label: c.rewind, icon: "game", run: () => window.FUN && window.FUN.rewind() },
-      { k: "issue bug report vilao villain", label: c.issue, icon: "game", run: () => window.FUN && window.FUN.issue() },
-      { k: "pets cats gatos status fome", label: c.pets, icon: "game", run: () => window.FUN && window.FUN.showPets() },
-      { k: "litter caixa areia limpar clean", label: c.litter, icon: "game", run: () => window.FUN && window.FUN.litter() },
-      { k: "photo foto camera print", label: c.photo, icon: "game", run: () => window.FUN && window.FUN.photo() },
-      { k: "weather clima tempo neve chuva sol", label: c.weather.replace("{v}", window.FUN ? window.FUN.weatherName() : ""), icon: "sun", run: () => window.FUN && window.FUN.cycleWeather() },
-      { k: "season estacao natal inverno verao", label: c.season.replace("{v}", window.FUN ? window.FUN.seasonName() : ""), icon: "sun", run: () => window.FUN && window.FUN.cycleSeason() },
-      { k: "music dance musica danca", label: c.music, icon: "game", run: () => window.FUN && window.FUN.dance() },
-      { k: "achievements conquistas trophy", label: c.achievements + (window.FUN ? " (" + window.FUN.achvCount() + ")" : ""), icon: "game", run: () => window.FUN && window.FUN.showAchievements() },
+      ...more.filter((m) => !m.first),
       { k: "theme", label: c.theme, icon: "sun", run: toggleTheme },
       { k: "lang", label: c.lang, icon: "globe", run: () => $("#toggle-lang").click() },
       { k: "email", label: c.email, icon: "copy", run: copyEmail },
@@ -475,7 +466,7 @@
   // ================================================================ reduced-motion changes at runtime
   motionQuery.addEventListener("change", (e) => { reduced = e.matches; restartTyped(); syncStars(); if (reduced) $$(".reveal").forEach((el) => el.classList.add("in")); });
 
-  // ================================================================ hooks for fun.js (pixel friends, special move)
+  // ================================================================ hooks for the pixel friends (fun/)
   window.SITE = {
     t, toast, $, $$, store,
     lang: () => lang,
@@ -483,6 +474,8 @@
     paletteOpen: () => !pal.hidden,
     pageRegions,
     closeMenu: () => { if (!menu.hidden) setMenu(false); },
+    addCommands: (fn) => { providers.push(fn); if (!pal.hidden) renderPalette(); },
+    openPalette, closePalette,
   };
 
   // ================================================================ boot

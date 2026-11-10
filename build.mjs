@@ -1,7 +1,7 @@
 // Bakes the copy from content.js into static HTML: /index.html (English) and /pt/index.html (Portuguese).
 // The page then reads fine without JavaScript, and crawlers, link previews and recruiting tools see the real content.
 // Usage: node build.mjs        (no dependencies)
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -16,6 +16,9 @@ vm.createContext(ctx);
 for (const f of ["content.js", "render.js"]) vm.runInContext(readFileSync(join(ROOT, f), "utf8"), ctx, { filename: f });
 const { CONTENT, LINKS, STACK, RENDER: R } = ctx;
 const template = readFileSync(join(ROOT, "src/index.html"), "utf8");
+const hash = (f) => createHash("sha256").update(readFileSync(join(ROOT, f))).digest("hex").slice(0, 10);
+// every module of the pixel friends (fun/ and fun/art/)
+const FUN_FILES = readdirSync(join(ROOT, "fun"), { recursive: true }).map((f) => "fun/" + f.split("\\").join("/")).filter((f) => f.endsWith(".js")).sort();
 
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const lookup = (c, path) => {
@@ -76,11 +79,13 @@ function build(lang) {
   html = fillId(html, "email-link", R.esc(LINKS.email));
   html = fillId(html, "year", String(new Date().getFullYear()));
 
-  // cache busting: each script and the stylesheet get ?v=<content hash>, so a deploy never mixes old and new files
-  for (const f of ["styles.css", "content.js", "render.js", "pixel.js", "main.js", "fun.js"]) {
-    const v = createHash("sha256").update(readFileSync(join(ROOT, f))).digest("hex").slice(0, 10);
-    html = once(html, new RegExp(`"/${f.replace(".", "\\.")}"`), () => `"/${f}?v=${v}"`, f);
+  // cache busting: each script and the stylesheet get ?v=<content hash>, so a deploy never mixes old and new files;
+  // the pixel friends' modules get theirs through an import map (their imports stay plain relative paths)
+  for (const f of ["styles.css", "content.js", "render.js", "main.js", "fun/index.js"]) {
+    html = once(html, new RegExp(`"/${f.replace(/[./]/g, "\\$&")}"`), () => `"/${f}?v=${hash(f)}"`, f);
   }
+  const imports = Object.fromEntries(FUN_FILES.map((f) => [`/${f}`, `/${f}?v=${hash(f)}`]));
+  html = once(html, /  <!--build:importmap-->/, () => `  <script type="importmap">${JSON.stringify({ imports })}</script>`, "importmap");
 
   // nothing left unfilled
   const empty = [...html.matchAll(/<([a-z0-9]+)\s[^>]*data-i18n="([^"]+)"[^>]*><\/\1>/g)].map((m) => m[2]);
