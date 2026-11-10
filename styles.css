@@ -591,3 +591,7 @@ html.px-laser-on, html.px-laser-on * { cursor: none !important; }
   html { scroll-behavior: auto; }
   .js .reveal { opacity: 1; translate: none; }
 }
+/* holding the yarn to wind it up: a dashed ring turns around the ball */
+.px-actor.px-winding { cursor: grabbing; }
+.px-actor.px-winding::after { content: ""; position: absolute; inset: -9px; border: 2px dashed rgba(var(--tint), .7); border-radius: 50%; animation: spin 1.4s linear infinite; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .px-actor.px-winding::after { animation: none; } }

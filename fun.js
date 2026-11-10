@@ -1552,7 +1552,7 @@
   layer.insertBefore(thread, layer.firstChild);
   const SEG = 9, MAX_NODES = 240;
   const SNAG = ".btn, .tech, .impact-card, .job, .chips li, .project, .contact-card, .filter, .section-head h2, .nav";
-  let rope = [], anchorX = null, rewinding = false, colliders = [], collidersAt = 0;
+  let rope = [], anchorX = null, rewinding = false, winding = false, colliders = [], collidersAt = 0;
   window.addEventListener("scroll", () => { collidersAt = 0; }, { passive: true });
   function refreshColliders() {
     colliders = [...document.querySelectorAll(SNAG)].map((el) => el.getBoundingClientRect())
@@ -1582,7 +1582,7 @@
     // unspool: there is always a bit more thread out than the straight distance back to where it started (never less than before);
     // the slack hangs or piles up on the floor like real thread
     const want = Math.min(MAX_NODES, Math.ceil((Math.hypot(bx - anchorX, by - ropeFloor()) * 1.25) / SEG) + 1);
-    while (rope.length < want && !rewinding) rope.push({ x: bx, y: by, px: bx, py: by });
+    while (rope.length < want && !rewinding && !winding) rope.push({ x: bx, y: by, px: bx, py: by });
     // verlet: gravity and a little air drag
     const f = Math.min(2, dt * 60), g = 0.42 * f * f;
     for (let i = 1; i < rope.length; i++) {
@@ -1636,6 +1636,88 @@
     if (rope.length > 1) rope.pop();
     else { rewinding = false; yarn.mode = "ground"; yarn.y = yarn.floor(); yarn.vx = 0; }
   }
+  // Winding by hand: the ball stays put and the thread is reeled in; the loose end gets pulled along the floor.
+  function windIn(n) {
+    const bx = yarn.cx(), by = yarn.y + yarn.h / 2;
+    for (let i = 0; i < n && rope.length > 1; i++) {
+      rope.pop();
+      const left = ((rope.length - 1) * SEG) / 1.25, dy = ropeFloor() - by, dx = anchorX - bx;
+      const reach = Math.sqrt(Math.max(0, left * left - dy * dy));
+      if (Math.abs(dx) > reach) anchorX = bx + Math.sign(dx) * reach;
+    }
+    if (rope.length > 2) return false;
+    ropeReset();
+    yarn.pop("heart");
+    yarn.say(bubble(t("fun.wound"), "star"), 1400);
+    return true;
+  }
+  // The yarn: a tap kicks it, a drag throws it, and holding it while turning circles (either way) winds the thread up.
+  let yarnHintAt = 0;
+  const wrapAngle = (d) => Math.atan2(Math.sin(d), Math.cos(d));
+  function yarnHint() {
+    if (rope.length < 8 || now() < yarnHintAt) return;
+    yarnHintAt = now() + 9000;
+    yarn.say(bubble(t("fun.windHint"), "star"), 1800);
+  }
+  function bindYarn() {
+    yarn.el.addEventListener("pointerdown", (e) => {
+      if (ko || rewinding || actors.some((a) => a.tangledUntil)) return;
+      e.preventDefault();
+      try { yarn.el.setPointerCapture(e.pointerId); } catch (err) { /* already released */ }
+      // catching it stops it where it is
+      yarn.mode = "held"; yarn.vx = yarn.vy = 0; yarn.queue = []; yarn.task = null;
+      const sx = e.clientX, sy = e.clientY, ox = sx - yarn.x, oy = sy - yarn.y;
+      let mode = "press", lx = sx, ly = sy, lt = now(), vx = 0, vy = 0, turn = 0, dir = null, ang = null, acc = 0;
+      const startWind = () => {
+        mode = "wind"; winding = true;
+        yarn.mode = "held"; yarn.vx = yarn.vy = 0; yarn.queue = []; yarn.task = null;
+        yarn.el.classList.add("px-winding");
+        yarnHint();
+      };
+      const hold = setTimeout(() => { if (mode === "press") startWind(); }, 320);
+      const move = (ev) => {
+        const x = ev.clientX, y = ev.clientY;
+        if (mode === "press" && Math.hypot(x - sx, y - sy) > 6) { mode = "drag"; clearTimeout(hold); grab(yarn); }
+        if (mode === "drag") {
+          const tn = now(), dt = Math.max(8, tn - lt) / 1000, mx = x - lx, my = y - ly;
+          vx = vx * 0.4 + 0.6 * mx / dt; vy = vy * 0.4 + 0.6 * my / dt;
+          lx = x; ly = y; lt = tn;
+          yarn.x = clamp(x - ox, 0, yarn.maxX()); yarn.y = clamp(y - oy, 0, yarn.floor());
+          // swinging it round in circles also winds it: add up how much the drag keeps turning
+          if (Math.hypot(mx, my) > 3) { const d = Math.atan2(my, mx); if (dir != null) turn += wrapAngle(d - dir); dir = d; }
+          if (Math.abs(turn) > Math.PI * 1.6) startWind();
+          return;
+        }
+        if (mode !== "wind") return;
+        const cx = yarn.cx(), cy = yarn.y + yarn.h / 2, a2 = Math.atan2(y - cy, x - cx);
+        if (Math.hypot(x - cx, y - cy) < 5) return;
+        if (ang != null) {
+          const d = wrapAngle(a2 - ang);
+          acc += Math.abs(d);
+          yarn.spin = (yarn.spin || 0) + (d * 180) / Math.PI;
+        }
+        ang = a2;
+        while (acc > 0.3) {
+          acc -= 0.3;
+          if (windIn(Math.ceil(Math.max(2, rope.length / 35)))) { unlock("yarn"); mode = "done"; break; }
+        }
+      };
+      const up = () => {
+        clearTimeout(hold);
+        yarn.el.removeEventListener("pointermove", move);
+        yarn.el.removeEventListener("pointerup", up);
+        yarn.el.removeEventListener("pointercancel", up);
+        yarn.el.classList.remove("px-winding");
+        if (mode === "press") kickYarn(yarn);
+        else if (mode === "drag") { yarn.mode = "air"; yarn.vx = clamp(vx, -1400, 1400); yarn.vy = clamp(vy, -1400, 900); unlock("yarn"); }
+        else { winding = false; yarn.mode = "air"; yarn.vx = 0; yarn.vy = 0; }
+      };
+      yarn.el.addEventListener("pointermove", move);
+      yarn.el.addEventListener("pointerup", up);
+      yarn.el.addEventListener("pointercancel", up);
+    });
+    yarn.el.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && !ko && yarn.mode !== "held") yarnHint(); });
+  }
   // The cat gets tangled in the thread and bolts, dragging the ball along.
   const tangledRun = () => ({
     start(a) { this.tx = rand(10, a.maxX()); },
@@ -1648,7 +1730,7 @@
       a.x += Math.sign(d) * Math.min(Math.abs(d), 330 * dt);
       a.setFrame(a.gait[Math.floor(now() / 60) % a.gait.length]);
       if (Math.random() < 0.012) launch(a, clamp(a.x + a.face * 60, 4, a.maxX()), a.floor(), 0.35);
-      if (yarn && yarn.mode === "held" && !rewinding) { yarn.x = a.cx() - a.face * a.w * 0.6 - yarn.w / 2; yarn.y = yarn.floor(); yarn.spin = (yarn.spin || 0) + a.face * 22; }
+      if (yarn && yarn.mode === "held" && !rewinding && !winding) { yarn.x = a.cx() - a.face * a.w * 0.6 - yarn.w / 2; yarn.y = yarn.floor(); yarn.spin = (yarn.spin || 0) + a.face * 22; }
       return false;
     },
   });
@@ -2028,8 +2110,7 @@
   yarn.brain = () => {}; yarn.rolls = true; yarn.bouncy = true;
   yarn.x = Math.round(innerWidth * 0.8);
   yarn.onThrow = () => unlock("yarn");
-  bind(yarn, kickYarn, () => {});
-  yarn.el.addEventListener("dblclick", (e) => { e.preventDefault(); rewindYarn(); });
+  bindYarn();
   applySeason();
   // Friday afternoon: the Friday Deploy shows up once per visit
   const nowDate = new Date();
