@@ -104,7 +104,7 @@ async () => {
   await sleep(600);
   const range = document.createRange(); range.selectNodeContents(h2);
   getSelection().removeAllRanges(); getSelection().addRange(range);
-  for (let i = 0; i < 80 && cat.mode !== "perch" && cat.base !== "paw"; i++) await sleep(100);
+  for (let i = 0; i < 160 && cat.mode !== "perch" && cat.base !== "paw"; i++) await sleep(100);   // it may walk over from the far side first
   check("cat jumps at the selected text", cat.mode === "perch" || cat.base === "paw", `${cat.mode} ${cat.base}`);
   getSelection().removeAllRanges();
   await sleep(1500);
